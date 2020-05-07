@@ -3,12 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Gaps and Islands](#gaps-and-islands)
-  - [NodeJS](#nodejs)
-    - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
-      - [Pipestreaming Solution](#pipestreaming-solution)
-      - [Node-Readlines](#node-readlines)
-    - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
   - [SQL](#sql)
+    - [The Gaps-And-Islands Pattern](#the-gaps-and-islands-pattern)
     - [Maximum Value in Group / Biggest X in Subgroup](#maximum-value-in-group--biggest-x-in-subgroup)
     - [Find RegEx Match in a Text Array](#find-regex-match-in-a-text-array)
     - [Immutable Columns in SQL](#immutable-columns-in-sql)
@@ -18,6 +14,11 @@
     - [`find` patterns](#find-patterns)
   - [better `df`](#better-df)
     - [Using `dutree`](#using-dutree)
+  - [NodeJS](#nodejs)
+    - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
+      - [Pipestreaming Solution](#pipestreaming-solution)
+      - [Node-Readlines](#node-readlines)
+    - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -25,195 +26,18 @@
 
 # Gaps and Islands
 
+## SQL
+
+### The Gaps-And-Islands Pattern
+
 https://stackoverflow.com/questions/17046204/how-to-find-the-boundaries-of-groups-of-contiguous-sequential-numbers
 https://stackoverflow.com/questions/tagged/gaps-and-islands
 
 https://www.xaprb.com/blog/2006/03/22/find-contiguous-ranges-with-sql/
 
-## NodeJS
-
-<!-- <insert src='./reading-file-lines.md'/> -->
-<!-- './reading-file-lines.md' -->
-
-
-### Reading Text Files Line by Line
-
-Reading a text file in a linewise fashion is a basic task, yet surprisingly hard to
-accomplish in NodeJS. There are two good solutions:
-
-#### Pipestreaming Solution
-
-Using basic [PipeStreams](https://github.com/loveencounterflow/pipestreams), the more fully-featured
-[PipeDreams](https://github.com/loveencounterflow/pipedreams), or their successor (and WIP)
-[SteamPipes](https://github.com/loveencounterflow/steampipes), a pipeline can be built with a file reader as
-source, followed by a `$split()` transform.
-
-The drawback here is that currently, there is no solution to do this synchronously, and, because
-the lines of text become only available within stream transforms, it is not possible to build
-an iterator. ATM it is not quite clear to me whether building iterators on top of a pipestreaming
-solution is possible at all.
-
-#### Node-Readlines
-
-Luckily there's the [n-readlines](https://github.com/nacholibre/node-readlines) package. From the blurb:
-
-> Reading file line by line may seem like a trivial problem, but in node, there is no straightforward way to
-> do it. There are a lot of libraries using Transform Streams to achieve it, but it seems like a overkill,
-> so I've wrote simple version using only the filesystem module of node. Note that this is synchronous
-> library.
-
-Usage is simple:
-
-```coffee
-@walk_lines = ( path ) ->
-  Readlines = require 'n-readlines'
-  liner     = new Readlines path
-  while line = liner.next()
-  	# observe `line` is always a `Buffer`
-    yield line.toString()
-  return null
+```sql
+<insert src='./gaps-and-islands.icql'/>
 ```
-
-
-
-
-<!-- <insert src='./avoiding-accidental-string-substitutions.md'/> -->
-<!-- './avoiding-accidental-string-substitutions.md' -->
-
-### Avoiding Accidental String Substitutions (so-called A$$es)
-
-JavaScript's `String::replace()` function has that sometimes-useful feature that is replacement patterns in
-the replacement string; for example, when you do `'abc'.replace /(b)/g, '==$1=='`, you'll get `'a==b==c'`.
-
-Less thoughts are often spent on that feature opening a startling backdoor for things to go wrong: Of
-course, if some characters in the replacement may trigger special feature, that means that inevitably there
-will be times when all goes well until some kind of unexpected input cause weird things to happen.
-
-Today that happened to me. Due to my SQL adapter not accepting SQL values tuples (that you need for queries
-like `select * from t where x in ( 'a', 'b', 'c' )`), I had to roll my own. That wasn't too hard given that
-I had already implemented basic SQL value interpolation for a related project:
-
-```coffee
-glyphs_tuple  = generate_sql_values_tuple glyphs
-sql 					= sql_template.replace /\?glyphs\?/g, glyphs_tuple
-```
-
-Now that query had already run thousands of times without problems—but today was the first time the `glyphs`
-variable contained a `$` dollar sign; the `glyphs_tuple` then looked like `( '#', '!', '$', '%' )`. Should
-be no problem! But it is: as [the
-docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace)
-clearly state:
-
-> `$'`	inserts the portion of the string that follows the matched substring.
-
-So when you do `'abc'.replace /(b)/g, "$"`, you get `'a$c'`, no problem indeed. But add a quote as in
-`'abc'.replace /(b)/g, "$'"`, and suddenly the result is `'acc'`.
-
-This particular aspect—that only *some* sequences cause special behavior—makes the feature even more
-insidious. Even worse, `'abc'.replace /(b)/g, "$1"` gives `'abc'` as expected, but any number beyond `1` is
-not special, so `'abc'.replace /(b)/g, "$2"` gives `'a$2c'` and so. This is because there is no second group
-in *this* pattern; use another pattern with two groups and `$2` *will* become special.
-
-Now, this isn't rocket science, but certainly obnoxious. Because the odds are so small that a random string
-will contain one of the problematic sequences, likewise, the odds are small that you'd even catch this with
-testing unless you're throwing insane amounts of test data against each `replace()` instance.
-
-It's probably better to heed this piecve of advice:
-
-> If a feature is sometimes useful and sometimes dangerous and if there is a better option then always use
-> the better option.—[D. Crockford](https://blog.gisspan.com/2016/07/Constructor-Vs-Factory.html)
-
-Luckily, There's a way out: use a function: As per the docs, `String.replace ( ... ) -> ...` is free from
-these surprising effects:
-
-> [t]he function's result (return value) will be used as the replacement string. [...] [t]he [...] special
-> replacement patterns do not apply in this case.)
-
-Therefore, the fix is simple:
-
-```coffee
-# sql = sql_template.replace /\?glyphs\?/g,    glyphs_tuple
-sql   = sql_template.replace /\?glyphs\?/g, -> glyphs_tuple
-```
-
-
-
-
-
-## SQL
-
-<!-- <insert src='./gaps-and-islands.icql'/> -->
-<!-- './gaps-and-islands.icql' -->
--- .progress 1000
-
-create table sequence ( id integer not null primary key );
-insert into sequence values
-  (  1 ), (  2 ), (  3 ), (  4 ), (  5 ),
-  (  6 ), (  7 ), (  8 ), (  9 ), ( 10 ),
-  ( 11 ), ( 12 ), ( 13 ), ( 14 ), ( 15 ),
-  ( 16 ), ( 17 ), ( 18 ), ( 19 ), ( 20 );
-
-delete from sequence where id in ( 5, 11, 12, 13, 14, 7 );
-
--- ---------------------------------------------------------------------------------------------------------
--- thx to https://www.xaprb.com/blog/2006/03/22/find-contiguous-ranges-with-sql/
-create view ranges_with_subselect as select
-    L.id                          as start,
-    ( select
-          min( A.id ) as id
-        from sequence             as A
-        left outer join sequence  as B on ( A.id = B.id - 1 )
-        where true
-          and B.id is null
-          and A.id >= L.id )      as end
-  from sequence             as L
-  left outer join sequence  as R on R.id = L.id - 1
-  where R.id is null;
-
-
--- ---------------------------------------------------------------------------------------------------------
--- thx to https://sqlblogcasts.com/blogs/sqlandthelike/archive/2009/08/27/sql-and-contiguous-data-ranges.aspx
-create view ranges_with_window as with V1 as ( select
-    id,
-    row_number() over ( order by id desc ) as rownum
-  from sequence )
-  select
-    id + V1.rownum as xxx,
-    min( id ) as first_id,
-    max( id ) as last_id
-  from V1
-  group by id + V1.rownum
-  order by first_id;
-
--- ---------------------------------------------------------------------------------------------------------
--- A solution popularized by Itzik Ben Gan is to use the fact that row_number() OVER (ORDER BY number) -
--- number remains constant within an "island" and cannot appear in multiple islands.
--- NB: If number is not guaranteed to be unique replace row_number with dense_rank.
-create view ranges_ala_bengan as with t as ( select
-    -- row_number() over ( order by id ) - id as group_id,
-    dense_rank() over ( order by id ) - id as group_id,
-    id
-  from sequence )
-  select
-    -- group_id    as group_id,
-    min( id )   as first_id,
-    max( id )   as last_id
-  from   t
-  group by group_id
-  order by first_id;
-
--- ---------------------------------------------------------------------------------------------------------
-.print ranges_with_subselect
-select * from ranges_with_subselect;
-.print ranges_with_window
-select * from ranges_with_window;
-.print ranges_ala_bengan
-select * from ranges_ala_bengan;
-
-
-
-
-
 
 ### Maximum Value in Group / Biggest X in Subgroup
 
@@ -439,6 +263,116 @@ cargo install --git https://github.com/nachoparker/dutree.git
 ```bash
 dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ```
+
+
+## NodeJS
+
+<!-- <insert src='./reading-file-lines.md'/> -->
+<!-- './reading-file-lines.md' -->
+
+
+### Reading Text Files Line by Line
+
+Reading a text file in a linewise fashion is a basic task, yet surprisingly hard to
+accomplish in NodeJS. There are two good solutions:
+
+#### Pipestreaming Solution
+
+Using basic [PipeStreams](https://github.com/loveencounterflow/pipestreams), the more fully-featured
+[PipeDreams](https://github.com/loveencounterflow/pipedreams), or their successor (and WIP)
+[SteamPipes](https://github.com/loveencounterflow/steampipes), a pipeline can be built with a file reader as
+source, followed by a `$split()` transform.
+
+The drawback here is that currently, there is no solution to do this synchronously, and, because
+the lines of text become only available within stream transforms, it is not possible to build
+an iterator. ATM it is not quite clear to me whether building iterators on top of a pipestreaming
+solution is possible at all.
+
+#### Node-Readlines
+
+Luckily there's the [n-readlines](https://github.com/nacholibre/node-readlines) package. From the blurb:
+
+> Reading file line by line may seem like a trivial problem, but in node, there is no straightforward way to
+> do it. There are a lot of libraries using Transform Streams to achieve it, but it seems like a overkill,
+> so I've wrote simple version using only the filesystem module of node. Note that this is synchronous
+> library.
+
+Usage is simple:
+
+```coffee
+@walk_lines = ( path ) ->
+  Readlines = require 'n-readlines'
+  liner     = new Readlines path
+  while line = liner.next()
+  	# observe `line` is always a `Buffer`
+    yield line.toString()
+  return null
+```
+
+
+
+
+<!-- <insert src='./avoiding-accidental-string-substitutions.md'/> -->
+<!-- './avoiding-accidental-string-substitutions.md' -->
+
+### Avoiding Accidental String Substitutions (so-called A$$es)
+
+JavaScript's `String::replace()` function has that sometimes-useful feature that is replacement patterns in
+the replacement string; for example, when you do `'abc'.replace /(b)/g, '==$1=='`, you'll get `'a==b==c'`.
+
+Less thoughts are often spent on that feature opening a startling backdoor for things to go wrong: Of
+course, if some characters in the replacement may trigger special feature, that means that inevitably there
+will be times when all goes well until some kind of unexpected input cause weird things to happen.
+
+Today that happened to me. Due to my SQL adapter not accepting SQL values tuples (that you need for queries
+like `select * from t where x in ( 'a', 'b', 'c' )`), I had to roll my own. That wasn't too hard given that
+I had already implemented basic SQL value interpolation for a related project:
+
+```coffee
+glyphs_tuple  = generate_sql_values_tuple glyphs
+sql 					= sql_template.replace /\?glyphs\?/g, glyphs_tuple
+```
+
+Now that query had already run thousands of times without problems—but today was the first time the `glyphs`
+variable contained a `$` dollar sign; the `glyphs_tuple` then looked like `( '#', '!', '$', '%' )`. Should
+be no problem! But it is: as [the
+docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace)
+clearly state:
+
+> `$'`	inserts the portion of the string that follows the matched substring.
+
+So when you do `'abc'.replace /(b)/g, "$"`, you get `'a$c'`, no problem indeed. But add a quote as in
+`'abc'.replace /(b)/g, "$'"`, and suddenly the result is `'acc'`.
+
+This particular aspect—that only *some* sequences cause special behavior—makes the feature even more
+insidious. Even worse, `'abc'.replace /(b)/g, "$1"` gives `'abc'` as expected, but any number beyond `1` is
+not special, so `'abc'.replace /(b)/g, "$2"` gives `'a$2c'` and so. This is because there is no second group
+in *this* pattern; use another pattern with two groups and `$2` *will* become special.
+
+Now, this isn't rocket science, but certainly obnoxious. Because the odds are so small that a random string
+will contain one of the problematic sequences, likewise, the odds are small that you'd even catch this with
+testing unless you're throwing insane amounts of test data against each `replace()` instance.
+
+It's probably better to heed this piecve of advice:
+
+> If a feature is sometimes useful and sometimes dangerous and if there is a better option then always use
+> the better option.—[D. Crockford](https://blog.gisspan.com/2016/07/Constructor-Vs-Factory.html)
+
+Luckily, There's a way out: use a function: As per the docs, `String.replace ( ... ) -> ...` is free from
+these surprising effects:
+
+> [t]he function's result (return value) will be used as the replacement string. [...] [t]he [...] special
+> replacement patterns do not apply in this case.)
+
+Therefore, the fix is simple:
+
+```coffee
+# sql = sql_template.replace /\?glyphs\?/g,    glyphs_tuple
+sql   = sql_template.replace /\?glyphs\?/g, -> glyphs_tuple
+```
+
+
+
 
 
 
