@@ -1,19 +1,19 @@
 
 
-### Immutable Columns with SQL
+### Immutable Columns in SQL
 
-In the generic table `datoms`, created below, we want to have a field `stamped`, default `false` that may be
-set to `true` to indicate the datom is outdated and is no longer in use; apart from that, we want to
+In the generic table `datoms`, created below, we want to have a field `stamped`, default `false`, that may
+be set to `true` to indicate the record is outdated and is no longer in use; apart from that, we want to
 prohibit any other update to any row, including setting `stamped` to `false` again (and thereby
 re-activating the record).
 
-We achieve that in Solution A by adding a `before update` trigger on the table; for convenience, we have
+We achieve that in **Solution A** by adding a `before update` trigger on the table; for convenience, we have
 excluded all calls to `update datoms` by adding a clause `when ( old is distinct from new )` *to the `create
 trigger` statement*; in other words, the trigger function will only be called when the conditions in the
 `when` clause are met.
 
 Using this technique, it is possible to shift *all* of the logic from the trigger function to the trigger
-declaration, as we have done in Solution B. The first two conditions,
+declaration, as we have done in **Solution B**. The first two conditions,
 
 ```sql
   for each row when (
@@ -65,9 +65,6 @@ create function IMMUTABLE.on_before_update_datoms() returns trigger language plp
         'illegal to update fields %s of record %s', ¶changes, old );
       end if;
     return new; end; $$;
-    -- perform log( '^IMMUTABLE@44644^', old::text, '->', new::text );
-    -- select column_name as name from information_schema.columns
-    -- where table_schema = tg_table_schema and table_name = tg_table_name;
 
 -- ---------------------------------------------------------------------------------------------------------
 create trigger on_before_update_datoms before update on IMMUTABLE.datoms
@@ -81,7 +78,6 @@ insert into IMMUTABLE.datoms ( vnr, key, value ) values
   ( '{4}', '^foo', '{"$value":42}' );
 
 -- ---------------------------------------------------------------------------------------------------------
--- select * from IMMUTABLE.datoms order by vnr;
 do $$ begin
   begin update IMMUTABLE.datoms set key     = '^other'       where vnr = '{3}'; exception when others then raise notice '*error* (%) %', sqlstate, sqlerrm; end;
   begin update IMMUTABLE.datoms set value   = '{"foo":true}' where vnr = '{3}'; exception when others then raise notice '*error* (%) %', sqlstate, sqlerrm; end;
@@ -90,24 +86,18 @@ do $$ begin
   begin update IMMUTABLE.datoms set stamped = false          where vnr = '{4}'; exception when others then raise notice '*error* (%) %', sqlstate, sqlerrm; end;
   end; $$;
 
--- select * from IMMUTABLE.datoms order by vnr;
-
 rollback;
 ```
 
 #### SOLUTION B
 
 ```sql
-create function IMMUTABLE.on_before_update_datoms() returns trigger language plpgsql as $$
-  /* thx to https://stackoverflow.com/a/23792079/7568091 for the hstore thing */
-  declare
-    ¶changes text[];
-  begin
-    raise sqlstate 'IMM04' using message = format(
-      'illegal to update fields %s of record %s', ¶changes, old );
+create function IMMUTABLE.on_before_update_datoms() returns trigger language plpgsql as $$ begin
+  raise sqlstate 'IMM04' using message = format( 'illegal to update record %s', old );
     end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
+/* thx to https://stackoverflow.com/a/23792079/7568091 for the hstore thing */
 create trigger on_before_update_datoms before update on IMMUTABLE.datoms
   for each row when (
     old is distinct from new and (
