@@ -1,0 +1,69 @@
+-- .progress 1000
+
+create table sequence ( id integer not null primary key );
+insert into sequence values
+  (  1 ), (  2 ), (  3 ), (  4 ), (  5 ),
+  (  6 ), (  7 ), (  8 ), (  9 ), ( 10 ),
+  ( 11 ), ( 12 ), ( 13 ), ( 14 ), ( 15 ),
+  ( 16 ), ( 17 ), ( 18 ), ( 19 ), ( 20 );
+
+delete from sequence where id in ( 5, 11, 12, 13, 14, 7 );
+
+-- ---------------------------------------------------------------------------------------------------------
+-- thx to https://www.xaprb.com/blog/2006/03/22/find-contiguous-ranges-with-sql/
+create view ranges_with_subselect as select
+    L.id                          as start,
+    ( select
+          min( A.id ) as id
+        from sequence             as A
+        left outer join sequence  as B on ( A.id = B.id - 1 )
+        where true
+          and B.id is null
+          and A.id >= L.id )      as end
+  from sequence             as L
+  left outer join sequence  as R on R.id = L.id - 1
+  where R.id is null;
+
+
+-- ---------------------------------------------------------------------------------------------------------
+-- thx to https://sqlblogcasts.com/blogs/sqlandthelike/archive/2009/08/27/sql-and-contiguous-data-ranges.aspx
+create view ranges_with_window as with V1 as ( select
+    id,
+    row_number() over ( order by id desc ) as rownum
+  from sequence )
+  select
+    id + V1.rownum as xxx,
+    min( id ) as first_id,
+    max( id ) as last_id
+  from V1
+  group by id + V1.rownum
+  order by first_id;
+
+-- ---------------------------------------------------------------------------------------------------------
+-- A solution popularized by Itzik Ben Gan is to use the fact that row_number() OVER (ORDER BY number) -
+-- number remains constant within an "island" and cannot appear in multiple islands.
+-- NB: If number is not guaranteed to be unique replace row_number with dense_rank.
+create view ranges_ala_bengan as with t as ( select
+    -- row_number() over ( order by id ) - id as group_id,
+    dense_rank() over ( order by id ) - id as group_id,
+    id
+  from sequence )
+  select
+    -- group_id    as group_id,
+    min( id )   as first_id,
+    max( id )   as last_id
+  from   t
+  group by group_id
+  order by first_id;
+
+-- ---------------------------------------------------------------------------------------------------------
+.print ranges_with_subselect
+select * from ranges_with_subselect;
+.print ranges_with_window
+select * from ranges_with_window;
+.print ranges_ala_bengan
+select * from ranges_ala_bengan;
+
+
+
+
