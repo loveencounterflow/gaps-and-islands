@@ -23,9 +23,12 @@ echo                      = ( text ) -> _echo text.replace /\n$/, ''
 PATH                      = require 'path'
 FSP                       = ( require 'fs' ).promises
 PGT                       = require 'paragate'
-resolve_path              = ( path ) -> PATH.resolve PATH.join __dirname, path
-read_file                 = ( path ) -> await FSP.readFile ( resolve_path path ), { encoding: 'utf-8', }
-
+join                      = ( me, P... ) -> PATH.resolve PATH.join me.base_path, P...
+read                      = ( me, path ) -> await FSP.readFile path, { encoding: 'utf-8', }
+clear                     = ( me ) -> await FSP.writeFile me.target_path, ''
+write                     = ( me, text ) -> await FSP.appendFile me.target_path, text.toString()
+comment                   = ( text ) -> '<!-- ' + ( text.toString().replace /--/g, '-_' ) + ' -->\n'
+unquote                   = ( text ) -> text.replace /^(['"])(.*)\1$/, '$2'
 
 #-----------------------------------------------------------------------------------------------------------
 @interpret_inserts = ( me, token ) ->
@@ -33,32 +36,38 @@ read_file                 = ( path ) -> await FSP.readFile ( resolve_path path )
     switch d.$key
       when '<document', '>document' then null
       when '^text'
-        echo d.text
+        await write me, d.text
       when '^tag'
         unless d.name is 'insert'
-          echo d.text
+          await write me, d.text
           continue
-        echo CND.reverse CND.blue d
+        await write me, comment d.text
+        await write me, comment d.atrs.src
+        path  = PATH.join me.base_path, unquote d.atrs.src ### TAINT should be done by HTML parser ###
+        await write me, await read me, path
       else throw new Error "^4776^ unknown token $key #{rpr d.$key}"
   return null
 
 #-----------------------------------------------------------------------------------------------------------
 @compile_readme = ->
-  me =
-    target_path:  resolve_path '../README.md'
-    source:       await read_file '../main.md'
+  me = {}
+  me.base_path    = PATH.resolve PATH.join __dirname, '..'
+  me.source_path  = join me, 'main.md'
+  me.target_path  = join me, 'README.md'
+  me.source       = await read me, me.source_path
   #.........................................................................................................
-  for d in PGT.RXWS.grammar.parse source
+  await clear me
+  for d in PGT.RXWS.grammar.parse me.source
     # info d
     switch d.$key
       when '<document', '>document' then null
       when '^blank'
-        echo d.text
+        await write me, d.text
       when '^block'
         unless d.text.startsWith '<insert'
-          echo CND.blue d.text
+          await write me, d.text
           continue
-        @interpret_inserts me, d
+        await @interpret_inserts me, d
       else throw new Error "^4776^ unknown token $key #{rpr d.$key}"
   return me
 
