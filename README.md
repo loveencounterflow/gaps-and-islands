@@ -38,7 +38,6 @@ https://www.xaprb.com/blog/2006/03/22/find-contiguous-ranges-with-sql/
 ```sql
 
 <!-- <insert src='./gaps-and-islands.icql'/> -->
-<!-- './gaps-and-islands.icql' -->
 -- .progress 1000
 
 create table sequence ( id integer not null primary key );
@@ -156,7 +155,6 @@ select FM._array_regex_position( array[ 'foo', 'bar', 'baz' ], 'az' );  -- gives
 ```
 
 <!-- <insert src='./immutable-columns-in-sql.md'/> -->
-<!-- './immutable-columns-in-sql.md' -->
 
 
 ### Immutable Columns in SQL
@@ -341,7 +339,6 @@ dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ## NodeJS
 
 <!-- <insert src='./reading-file-lines.md'/> -->
-<!-- './reading-file-lines.md' -->
 
 
 ### Reading Text Files Line by Line
@@ -386,7 +383,6 @@ Usage is simple:
 
 
 <!-- <insert src='./avoiding-accidental-string-substitutions.md'/> -->
-<!-- './avoiding-accidental-string-substitutions.md' -->
 
 ### Avoiding Accidental String Substitutions (so-called A$$es)
 
