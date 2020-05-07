@@ -41,8 +41,8 @@ unquote                   = ( text ) -> text.replace /^(['"])(.*)\1$/, '$2'
         unless d.name is 'insert'
           await write me, d.text
           continue
-        await write me, comment d.text
-        await write me, comment d.atrs.src
+        # await write me, comment d.text
+        urge '^554^', "inserting #{d.atrs.src}"
         path  = PATH.join me.base_path, unquote d.atrs.src ### TAINT should be done by HTML parser ###
         await write me, await read me, path
       else throw new Error "^4776^ unknown token $key #{rpr d.$key}"
@@ -58,7 +58,6 @@ unquote                   = ( text ) -> text.replace /^(['"])(.*)\1$/, '$2'
   #.........................................................................................................
   await clear me
   for d in PGT.RXWS.grammar.parse me.source
-    # info d
     switch d.$key
       when '<document', '>document' then null
       when '^blank'
