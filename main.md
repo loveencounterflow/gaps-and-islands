@@ -2,41 +2,42 @@
 
 # Gaps and Islands
 
+## SQL
+
+### The Gaps-And-Islands Pattern
+
 https://stackoverflow.com/questions/17046204/how-to-find-the-boundaries-of-groups-of-contiguous-sequential-numbers
 https://stackoverflow.com/questions/tagged/gaps-and-islands
 
 https://www.xaprb.com/blog/2006/03/22/find-contiguous-ranges-with-sql/
 
-## NodeJS
-
-<insert src='./reading-file-lines.md'/>
-<insert src='./avoiding-accidental-string-substitutions.md'/>
-
-## SQL
+```sql
 
 <insert src='./gaps-and-islands.icql'/>
+
+```
 
 ### Maximum Value in Group / Biggest X in Subgroup
 
 https://stackoverflow.com/a/8749095
 
 ```sql
-  create view combifont as select
-      V1.linenr           as linenr,
-      V1.iclabel          as iclabel,
-      V1.styletag         as styletag,
-      V1.fontnick         as fontnick,
-      V1.glyphstyle       as glyphstyle
-    from            all_glyphs_and_stylerules as V1
-    left outer join all_glyphs_and_stylerules as V2 on ( true
-      and V1.iclabel  = V2.iclabel
-      and V1.styletag = V2.styletag
-      --  ^^^^^^^^^^^^^^^^^^^^^^^^^  join condition to narrow down on group
-      and V1.linenr   < V2.linenr )
-      --  ^^^^^^^^^^^^^^^^^^^^^^^    comparison that fails for V2 when V1 selector is maximal
-    where V2.linenr is null
-    --    ^^^^^^^^^^^^^^^^^ select maximum (or minimum w/ inverted comparator)
-    order by iclabel, styletag;
+create view combifont as select
+    V1.linenr           as linenr,
+    V1.iclabel          as iclabel,
+    V1.styletag         as styletag,
+    V1.fontnick         as fontnick,
+    V1.glyphstyle       as glyphstyle
+  from            all_glyphs_and_stylerules as V1
+  left outer join all_glyphs_and_stylerules as V2 on ( true
+    and V1.iclabel  = V2.iclabel
+    and V1.styletag = V2.styletag
+    --  ^^^^^^^^^^^^^^^^^^^^^^^^^  join condition to narrow down on group
+    and V1.linenr   < V2.linenr )
+    --  ^^^^^^^^^^^^^^^^^^^^^^^    comparison that fails for V2 when V1 selector is maximal
+  where V2.linenr is null
+  --    ^^^^^^^^^^^^^^^^^ select maximum (or minimum w/ inverted comparator)
+  order by iclabel, styletag;
 ```
 
 
@@ -64,8 +65,6 @@ select FM._array_regex_position( array[ 'foo', 'bar', 'baz' ], 'az' );  -- gives
 ## Linux Shell / Bash
 
 ### `find` patterns
-
-
 
 find all files by name, matching any pattern:
 
@@ -105,6 +104,10 @@ cargo install --git https://github.com/nachoparker/dutree.git
 dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ```
 
+## NodeJS
+
+<insert src='./reading-file-lines.md'/>
+<insert src='./avoiding-accidental-string-substitutions.md'/>
 
 
 
