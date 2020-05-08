@@ -6,10 +6,9 @@
 
 ### The Gaps-And-Islands Pattern
 
-https://stackoverflow.com/questions/17046204/how-to-find-the-boundaries-of-groups-of-contiguous-sequential-numbers
-https://stackoverflow.com/questions/tagged/gaps-and-islands
-
-https://www.xaprb.com/blog/2006/03/22/find-contiguous-ranges-with-sql/
+* https://stackoverflow.com/questions/17046204/how-to-find-the-boundaries-of-groups-of-contiguous-sequential-numbers
+* https://stackoverflow.com/questions/tagged/gaps-and-islands
+* https://www.xaprb.com/blog/2006/03/22/find-contiguous-ranges-with-sql/
 
 ```sql
 

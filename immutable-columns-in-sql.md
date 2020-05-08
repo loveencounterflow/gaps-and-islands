@@ -29,6 +29,10 @@ do look readable enough, however, the third one,
 
 is much harder to understand; maybe translating it to a function call could help.
 
+**UPDATE** implemented the above as `IMMUTABLE.record_has_changed( old, new )`,
+`IMMUTABLE.record_has_changed( old, new, Array[ 'except-columns' ] )` in
+[InterShop](https://github.com/loveencounterflow/intershop).
+
 
 #### SOLUTION A
 
