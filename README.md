@@ -30,10 +30,9 @@
 
 ### The Gaps-And-Islands Pattern
 
-https://stackoverflow.com/questions/17046204/how-to-find-the-boundaries-of-groups-of-contiguous-sequential-numbers
-https://stackoverflow.com/questions/tagged/gaps-and-islands
-
-https://www.xaprb.com/blog/2006/03/22/find-contiguous-ranges-with-sql/
+* https://stackoverflow.com/questions/17046204/how-to-find-the-boundaries-of-groups-of-contiguous-sequential-numbers
+* https://stackoverflow.com/questions/tagged/gaps-and-islands
+* https://www.xaprb.com/blog/2006/03/22/find-contiguous-ranges-with-sql/
 
 ```sql
 
@@ -184,6 +183,17 @@ do look readable enough, however, the third one,
 
 is much harder to understand; maybe translating it to a function call could help.
 
+**NOTE** As convenient as `when` conditions in trigger declarations may be, observe that **`when` conditions
+may not be used for tables containing generated columns**. This is because those columns are only generated
+until *after* the `before` triggers have been run (i.e. generated columns operate on the result of `before`
+trigger functions, which is reasonable). Therefore, to avoid later rewrites in case a generated column
+should be added to a table with a trigger, it seems to be better to always put the entire logic into the
+trigger function.
+
+**UPDATE** implemented the above as `IMMUTABLE.record_has_changed( old, new )`,
+`IMMUTABLE.record_has_changed( old, new, Array[ 'except-columns' ] )` in
+[InterShop](https://github.com/loveencounterflow/intershop).
+
 
 #### SOLUTION A
 
@@ -293,8 +303,6 @@ rollback;
 
 ### `find` patterns
 
-
-
 find all files by name, matching any pattern:
 
 ```bash
@@ -332,7 +340,6 @@ cargo install --git https://github.com/nachoparker/dutree.git
 ```bash
 dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ```
-
 
 ## NodeJS
 
