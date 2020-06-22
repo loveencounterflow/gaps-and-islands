@@ -351,6 +351,36 @@ cargo install --git https://github.com/nachoparker/dutree.git
 dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ```
 
+## Python3.6+
+
+### Immutable 'Data Objects'
+
+Python lacks the ability to freeze arbitrary objects; all it provides are structures that are immutable by
+design (strings, tuples) and user-definable classes that produce mutable instances. One way to bring a
+modicum of immutability to the language is demonstrated below, where `__setattr__()` throws unconditionally.
+Observe that this still allows to modify the values of attributes that are mutable data types.
+
+```py
+#-----------------------------------------------------------------------------------------------------------
+class Immutable:
+  def __setattr__( me, *P: Any ) -> None: raise KeyError( "^334^ forbidden to set attribute on immutable" )
+
+#-----------------------------------------------------------------------------------------------------------
+@total_ordering
+class Segment( Immutable ):
+
+  #---------------------------------------------------------------------------------------------------------
+  def __init__( me, lo: int, hi: int ) -> None:
+    me.lo: int                # <-- satisfy MyPy with suitable annotation...
+    me.hi: int                # <-- satisfy MyPy with suitable annotation...
+    me.__dict__[ 'lo' ] = lo  # ... to set attribute via `__dict__`
+    me.__dict__[ 'hi' ] = hi  # ... to set attribute via `__dict__`
+
+  #---------------------------------------------------------------------------------------------------------
+  @property
+  def size( me ) -> int: return me.hi - me.lo + 1
+```
+
 ## NodeJS
 
 
