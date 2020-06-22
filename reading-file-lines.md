@@ -33,7 +33,7 @@ Usage is simple:
   Readlines = require 'n-readlines'
   liner     = new Readlines path
   while line = liner.next()
-  	# observe `line` is always a `Buffer`
+    # observe `line` is always a `Buffer`
     yield line.toString()
   return null
 ```

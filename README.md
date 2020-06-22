@@ -388,7 +388,7 @@ Usage is simple:
   Readlines = require 'n-readlines'
   liner     = new Readlines path
   while line = liner.next()
-  	# observe `line` is always a `Buffer`
+    # observe `line` is always a `Buffer`
     yield line.toString()
   return null
 ```
@@ -412,7 +412,7 @@ I had already implemented basic SQL value interpolation for a related project:
 
 ```coffee
 glyphs_tuple  = generate_sql_values_tuple glyphs
-sql 					= sql_template.replace /\?glyphs\?/g, glyphs_tuple
+sql           = sql_template.replace /\?glyphs\?/g, glyphs_tuple
 ```
 
 Now that query had already run thousands of times without problems—but today was the first time the `glyphs`
@@ -421,7 +421,7 @@ be no problem! But it is: as [the
 docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace)
 clearly state:
 
-> `$'`	inserts the portion of the string that follows the matched substring.
+> `$'`  inserts the portion of the string that follows the matched substring.
 
 So when you do `'abc'.replace /(b)/g, "$"`, you get `'a$c'`, no problem indeed. But add a quote as in
 `'abc'.replace /(b)/g, "$'"`, and suddenly the result is `'acc'`.
