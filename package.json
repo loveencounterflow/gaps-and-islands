@@ -8,7 +8,7 @@
     "url": "git+https://github.com/loveencounterflow/gaps-and-islands.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node lib/main.js && doctoc README*"
   },
   "author": "",
   "license": "MIT",
