@@ -29,6 +29,23 @@ do look readable enough, however, the third one,
 
 is much harder to understand; maybe translating it to a function call could help.
 
+**NOTE** As convenient as `when` conditions in trigger declarations may be, observe that **`when` conditions
+may not be used for tables containing generated columns**. This is because those columns are only generated
+until *after* the `before` triggers have been run (i.e. generated columns operate on the result of `before`
+trigger functions, which is reasonable). Therefore, to avoid later rewrites in case a generated column
+should be added to a table with a trigger, it seems to be better to always put the entire logic into the
+trigger function.
+
+**NOTE** A further consequence of the last point is this: When working with tables that have generated
+columns, one should pay attention to the fact that these are (as of PGv12) always implicitly generated,
+always stored, and can never be set explicitly. This means that calls to `IMMUTABLE.record_has_changed()`
+must *always* at least include the name of auto-generated columns because they will be present in the `old`
+row but absent from the `new` row. For example, when there is one column `stamped` that may be changed and
+one column `_vnr0` that is generated in a table with immutable records, the correct call will be
+`IMMUTABLE.record_has_changed( old, new, '{stamped,_vnr0}' )`. With `_vnr0` omitted, the call will *always*
+return that the columns have changed (because `old._vnr0` is always present and `new._vnr0` is always
+absent).
+
 **UPDATE** implemented the above as `IMMUTABLE.record_has_changed( old, new )`,
 `IMMUTABLE.record_has_changed( old, new, Array[ 'except-columns' ] )` in
 [InterShop](https://github.com/loveencounterflow/intershop).
