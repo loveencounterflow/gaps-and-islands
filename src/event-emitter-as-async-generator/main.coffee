@@ -23,9 +23,19 @@ types                     = new ( require 'intertype' ).Intertype()
 MIXA                      = require 'mixa'
 SL                        = require 'intertext-splitlines'
 
+### thx to https://stackoverflow.com/a/59347615/7568091
 
-#-----------------------------------------------------------------------------------------------------------
-# resolve_project_path = ( path ) -> PATH.resolve PATH.join __dirname, '../../..', path
+Seems to be working so far.
+
+i.e. you create a dummy promise like in Khanh's solution so that you can wait for the first result, but then
+because many results might come in all at once, you push them into an array and reset the promise to wait
+for the result (or batch of results). It doesn't matter if this promise gets overwritten dozens of times
+before its ever awaited.
+
+Then we can yield all the results at once with yield* and flush the array for the next batch.
+
+###
+
 
 #-----------------------------------------------------------------------------------------------------------
 generate_lines_of_text = ( pause ) -> new Promise ( done ) =>
@@ -43,17 +53,34 @@ generate_lines_of_text = ( pause ) -> new Promise ( done ) =>
     process.stderr.write "and hello over the other channel!\n"
 
 
+#===========================================================================================================
+#
+#-----------------------------------------------------------------------------------------------------------
+class Controller # extends Object
+  constructor: ->
+    @collector            = []
+    @[ Symbol.iterator ]  = -> yield from @collector; @collector = []
+    @_resolve             = ->
+    @done                 = false
+    @send                 = _send.bind @
+    @advance              = _advance.bind @
+    @ratchet              = new Promise ( resolve ) => @_resolve = resolve
+    return null
+#...........................................................................................................
+_send     = ( d ) -> @collector.push d
+_advance  = -> @_resolve(); @ratchet = new Promise ( resolve ) => @_resolve = resolve
+
+
+#===========================================================================================================
+#
 #-----------------------------------------------------------------------------------------------------------
 demo_receiver = ( pause ) -> new Promise ( resolve_outer, reject_outer ) =>
   #---------------------------------------------------------------------------------------------------------
   g = ->
-    ### thx to https://stackoverflow.com/a/59347615/7568091 ###
     { spawn } = require 'child_process'
+    S             = new Controller()
+    debug '^3328345^', S
     has_finished  = false
-    results       = []
-    resolve       = () => null
-    promise       = new Promise ( r ) => resolve = r
-    done          = false
     cp            = spawn 'node', [ __filename, 'generate', '--pause', "#{pause}", ]
     splitliners   = {}
     #.......................................................................................................
@@ -61,27 +88,19 @@ demo_receiver = ( pause ) -> new Promise ( resolve_outer, reject_outer ) =>
       splitliners[ $key ] = SL.new_context()
       return ( data ) =>
         for $value from SL.walk_lines splitliners[ $key ], data
-          results.push Object.freeze { $key, $value, }
-        resolve()
-        promise = new Promise ( r ) => resolve = r
+          S.send Object.freeze { $key, $value, }
+        S.advance()
     #.......................................................................................................
-    cp.stdout.on  'data',   new_catcher '^stdout'
-    cp.stderr.on  'data',   new_catcher '^stderr'
-    debug '^1776^', splitliners
+    new_ender = ( $key ) ->
+      return ->
+        for $value from SL.flush splitliners[ $key ]
+          S.send Object.freeze { $key, $value, }
+        S.advance()
     #.......................................................................................................
-    cp.stdout.on  'end',    ->
-      $key = '^stdout'
-      for $value from SL.flush splitliners[ $key ]
-        results.push Object.freeze { $key, $value, }
-      resolve()
-      promise = new Promise ( r ) => resolve = r
-    #.......................................................................................................
-    cp.stderr.on  'end',    ->
-      $key = '^stderr'
-      for $value from SL.flush splitliners[ $key ]
-        results.push Object.freeze { $key, $value, }
-      resolve()
-      promise = new Promise ( r ) => resolve = r
+    cp.stdout.on  'data', new_catcher '^stdout'
+    cp.stderr.on  'data', new_catcher '^stderr'
+    cp.stdout.on  'end',  new_ender   '^stdout'
+    cp.stderr.on  'end',  new_ender   '^stderr'
     #.......................................................................................................
     cp.on 'error', ( error ) ->
       if has_finished
@@ -90,15 +109,9 @@ demo_receiver = ( pause ) -> new Promise ( resolve_outer, reject_outer ) =>
       has_finished = true
       reject_outer error
     #.......................................................................................................
-    cp.on 'close', =>
-      done = true
+    cp.on 'close', => S.done = true
     #.......................................................................................................
-    while not done
-      await promise
-      # debug '^334455^', rpr results
-      for x from results
-        yield x
-      results = []
+    while not S.done then await S.ratchet; yield from S # .collector;
   #---------------------------------------------------------------------------------------------------------
   SP = require 'steampipes'
   { $
