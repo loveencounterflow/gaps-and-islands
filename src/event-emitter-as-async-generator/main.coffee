@@ -98,7 +98,7 @@ new_receiver = ( delay ) ->
   #.......................................................................................................
   cp.on 'error', ( error ) ->
     if has_finished
-      warn error
+      warn "^3366^ #{rpr error}"
       return null
     has_finished = true
     warn "^3977^ receiver: reject_outer"
@@ -121,7 +121,6 @@ demo_receiver = ( delay ) -> new Promise ( resolve_outer, reject_outer ) =>
     splitliners = {}
     last        = Symbol 'last'
     return $ { last, }, ( d, send ) =>
-      debug '^3334^', d
       { $key, $value, } = d
       unless ( ctx = splitliners[ $key ] )?
         ctx = splitliners[ $key ] = SL.new_context()
@@ -141,10 +140,7 @@ demo_receiver = ( delay ) -> new Promise ( resolve_outer, reject_outer ) =>
     return resolve_outer()
   SP.pull pipeline...
   #.........................................................................................................
-  for await x from new_receiver delay
-    # whisper "^6786^ sending #{( rpr x )[ .. 50 ]}..."
-    source.send x
-  whisper "^6786^ calling source.end()"
+  source.send x for await x from new_receiver delay
   source.end()
   return null
 
