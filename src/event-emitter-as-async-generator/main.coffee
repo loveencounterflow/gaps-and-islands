@@ -22,6 +22,8 @@ PATH                      = require 'path'
 types                     = new ( require 'intertype' ).Intertype()
 MIXA                      = require 'mixa'
 SL                        = require 'intertext-splitlines'
+{ freeze, }               = Object
+
 
 ### thx to https://stackoverflow.com/a/59347615/7568091
 
@@ -38,18 +40,19 @@ Then we can yield all the results at once with yield* and flush the array for th
 
 
 #-----------------------------------------------------------------------------------------------------------
-generate_lines_of_text = ( pause ) -> new Promise ( done ) =>
-  process.stdout.write "generating lines with pause: #{rpr pause}\n"
+generate_lines_of_text = ( delay ) -> new Promise ( done ) =>
+  process.stdout.write "generating lines with delay: #{rpr delay}\n"
   sleep = ( dts ) -> new Promise ( done ) => setTimeout done, dts * 1000
-  text  = """just a generator demo"""
+  text  = """just a generator demo ###"""
   if module is require.main then do =>
     process.stdout.write 'helo' + '\n'
     words = text.split /\s+/
     for word in words
       process.stdout.write '\n'
       process.stdout.write word
-      if pause isnt 0
-        await sleep pause
+      if delay isnt 0
+        await sleep delay
+    process.stdout.write '\n'
     process.stderr.write "and hello over the other channel!\n"
 
 
@@ -68,78 +71,91 @@ class Controller # extends Object
     return null
 #...........................................................................................................
 _send     = ( d ) -> @collector.push d
-_advance  = -> @_resolve(); @ratchet = new Promise ( resolve ) => @_resolve = resolve
+_advance  = ( go_on = true ) ->
+  @done     = not go_on
+  @_resolve()
+  @ratchet  = new Promise ( resolve ) => @_resolve = resolve
 
 
 #===========================================================================================================
 #
+#---------------------------------------------------------------------------------------------------------
+new_receiver = ( delay ) ->
+  { spawn } = require 'child_process'
+  S             = new Controller()
+  cp            = spawn 'node', [ __filename, 'generate', '--delay', "#{delay}", ]
+  #.......................................................................................................
+  new_catcher = ( $key ) ->
+    return ( $value ) =>
+      S.send freeze { $key, $value, }
+      S.advance()
+  #.......................................................................................................
+  cp.stdout.on  'data', new_catcher '^stdout'
+  cp.stderr.on  'data', new_catcher '^stderr'
+  cp.on 'close', =>
+    help "^7399^ receiver: CP closed"
+    S.advance false
+  #.......................................................................................................
+  cp.on 'error', ( error ) ->
+    if has_finished
+      warn error
+      return null
+    has_finished = true
+    warn "^3977^ receiver: reject_outer"
+    reject_outer error
+  #.......................................................................................................
+  while not S.done
+    await S.ratchet; yield from S
+  help "^8743^ receiver: no more data"
+  return null
+
 #-----------------------------------------------------------------------------------------------------------
-demo_receiver = ( pause ) -> new Promise ( resolve_outer, reject_outer ) =>
-  #---------------------------------------------------------------------------------------------------------
-  g = ->
-    { spawn } = require 'child_process'
-    S             = new Controller()
-    debug '^3328345^', S
-    has_finished  = false
-    cp            = spawn 'node', [ __filename, 'generate', '--pause', "#{pause}", ]
-    splitliners   = {}
-    #.......................................................................................................
-    new_catcher = ( $key ) ->
-      splitliners[ $key ] = SL.new_context()
-      return ( data ) =>
-        for $value from SL.walk_lines splitliners[ $key ], data
-          S.send Object.freeze { $key, $value, }
-        S.advance()
-    #.......................................................................................................
-    new_ender = ( $key ) ->
-      return ->
-        for $value from SL.flush splitliners[ $key ]
-          S.send Object.freeze { $key, $value, }
-        S.advance()
-    #.......................................................................................................
-    cp.stdout.on  'data', new_catcher '^stdout'
-    cp.stderr.on  'data', new_catcher '^stderr'
-    cp.stdout.on  'end',  new_ender   '^stdout'
-    cp.stderr.on  'end',  new_ender   '^stderr'
-    #.......................................................................................................
-    cp.on 'error', ( error ) ->
-      if has_finished
-        warn error
-        return null
-      has_finished = true
-      reject_outer error
-    #.......................................................................................................
-    cp.on 'close', => S.done = true
-    #.......................................................................................................
-    while not S.done then await S.ratchet; yield from S # .collector;
+demo_receiver = ( delay ) -> new Promise ( resolve_outer, reject_outer ) =>
   #---------------------------------------------------------------------------------------------------------
   SP = require 'steampipes'
   { $
     $watch
     $drain }  = SP.export()
+  #---------------------------------------------------------------------------------------------------------
+  $split_channels = ->
+    splitliners = {}
+    last        = Symbol 'last'
+    return $ { last, }, ( d, send ) =>
+      debug '^3334^', d
+      { $key, $value, } = d
+      unless ( ctx = splitliners[ $key ] )?
+        ctx = splitliners[ $key ] = SL.new_context()
+      if d is last
+        send ( freeze { $key, $value, } ) for $value from SL.flush ctx
+        return null
+      send ( freeze { $key, $value, } ) for $value from SL.walk_lines ctx, $value
+      return null
+  #---------------------------------------------------------------------------------------------------------
   source      = SP.new_push_source()
   pipeline    = []
   pipeline.push source
-  # pipeline.push SP.$split()
+  pipeline.push $split_channels()
   pipeline.push $watch ( d ) -> urge d
-  pipeline.push $drain -> done()
-  SP.pull pipeline...
-  for await x from g()
-    source.send x
-  #.........................................................................................................
-  unless has_finished
-    has_finished = true
+  pipeline.push $drain ->
+    help "^3776^ pipeline: finished"
     return resolve_outer()
+  SP.pull pipeline...
+  #.........................................................................................................
+  for await x from new_receiver delay
+    # whisper "^6786^ sending #{( rpr x )[ .. 50 ]}..."
+    source.send x
+  whisper "^6786^ calling source.end()"
+  source.end()
   return null
 
 #-----------------------------------------------------------------------------------------------------------
 cli = -> new Promise ( done ) =>
   #.........................................................................................................
   runner = ( d ) =>
-    pause = d.verdict.parameters.pause ? 0
+    delay = d.verdict.parameters.delay ? 0
     switch d.verdict.cmd
-      when 'generate' then await generate_lines_of_text pause
-      when 'receive'  then await demo_receiver pause
+      when 'generate' then await generate_lines_of_text delay
+      when 'receive'  then await demo_receiver delay
       else throw new Error "^cli@33336^ unknown command #{rpr d.verdict.cmd}"
     done()
   #.........................................................................................................
@@ -149,13 +165,13 @@ cli = -> new Promise ( done ) =>
       'generate':
         description:  "generate series of words in different speeds"
         flags:
-          'pause':  { alias: 'p', type: Number, description: "seconds to pause between each chunk of data", }
+          'delay':  { alias: 'd', type: Number, description: "seconds to pause between each chunk of data", }
         runner: runner
       #.....................................................................................................
       'receive':
         description:  "spawn subprocess and process signals it emits"
         flags:
-          'pause':  { alias: 'p', fallback: null, type: Number, description: "seconds to pause between each chunk of data", }
+          'delay':  { alias: 'd', fallback: null, type: Number, description: "seconds to pause between each chunk of data", }
         runner: runner
   #.........................................................................................................
   MIXA.run jobdefs, process.argv
