@@ -38,5 +38,40 @@ Usage is simple:
   return null
 ```
 
+#### A Better Solution: InterText SplitLines
+
+A 'better', that is, as-fast-but-more-flexible solution is implemented in
+`src/read-undecoded-lines-from-stdin.coffee`. It uses `intertext-splitlines` to look for occurrences
+of `\x0a` bytes in the `stdin` stream, which is accessed with event handlers. In this sample, we do a bit
+of data processing as my problem at hand was to produce PostgreSQL `bytea` hexadecimal literals. The
+program reads from `stdin` and writes to `stdout`, so one can use it as e.g.
+
+```bash
+time ( cat myinputdata.txt | node lib/read-undecoded-lines-from-stdin.js > /tmp/anything.txt )
+```
+
+```coffee
+use_itxt_splitlines = -> new Promise ( resolve, reject ) =>
+  SL              = require 'intertext-splitlines'
+  { stdin
+    stdout }      = process
+  settings        = { decode: false, keep_newlines: false, }
+  as_hex_literal  = ( buffer ) -> '\\x' + ( buffer.toString 'hex' )
+  ctx             = SL.new_context settings
+  lnr             = 0
+  #.........................................................................................................
+  stdin.on 'data', ( d ) ->
+    for line from SL.walk_lines ctx, d
+      lnr++
+      stdout.write ( "\"dsk\",#{lnr}," ) + ( as_hex_literal line ) + '\n'
+  #.........................................................................................................
+  await process.stdin.once 'end', ->
+    for line from SL.flush ctx
+      lnr++
+      stdout.write ( "\"dsk\",#{lnr}," ) + ( as_hex_literal line ) + '\n'
+      resolve()
+  #.........................................................................................................
+  return null
+```
 
 
