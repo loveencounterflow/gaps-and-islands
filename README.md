@@ -25,6 +25,7 @@ This part to be updated by running `doctoc REDME.md`
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+
 # SQL
 
 ## The Gaps-And-Islands Pattern
@@ -301,6 +302,7 @@ select * from IMMUTABLE.datoms order by vnr;
 
 rollback;
 ```
+
 
 
 
