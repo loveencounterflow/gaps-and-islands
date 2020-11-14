@@ -22,6 +22,8 @@ This part to be updated by running `doctoc REDME.md`
     - [Node-Readlines](#node-readlines)
     - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
   - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
+- [CSS](#css)
+  - [CSS Variables with User Settings, Defaults](#css-variables-with-user-settings-defaults)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -488,6 +490,18 @@ Therefore, the fix is simple:
 # sql = sql_template.replace /\?glyphs\?/g,    glyphs_tuple
 sql   = sql_template.replace /\?glyphs\?/g, -> glyphs_tuple
 ```
+
+
+
+
+
+
+
+# CSS
+
+## CSS Variables with User Settings, Defaults
+
+
 
 
 
