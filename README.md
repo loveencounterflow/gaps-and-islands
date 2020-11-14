@@ -3,7 +3,7 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
+This part to be updated by running `doctoc REDME.md`
 
 - [SQL](#sql)
   - [The Gaps-And-Islands Pattern](#the-gaps-and-islands-pattern)
@@ -24,9 +24,6 @@
   - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-
-
 
 ## SQL
 
