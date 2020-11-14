@@ -1,6 +1,6 @@
 
 
-### Immutable Columns in SQL
+## Immutable Columns in SQL
 
 In the generic table `datoms`, created below, we want to have a field `stamped`, default `false`, that may
 be set to `true` to indicate the record is outdated and is no longer in use; apart from that, we want to
@@ -51,7 +51,7 @@ absent).
 [InterShop](https://github.com/loveencounterflow/intershop).
 
 
-#### SOLUTION A
+### SOLUTION A
 
 ```sql
 begin transaction;
@@ -110,7 +110,7 @@ do $$ begin
 rollback;
 ```
 
-#### SOLUTION B
+### SOLUTION B
 
 ```sql
 create function IMMUTABLE.on_before_update_datoms() returns trigger language plpgsql as $$ begin
