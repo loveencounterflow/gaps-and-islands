@@ -9,19 +9,19 @@ This part to be updated by running `doctoc REDME.md`
   - [The Gaps-And-Islands Pattern](#the-gaps-and-islands-pattern)
   - [Maximum Value in Group / Biggest X in Subgroup](#maximum-value-in-group--biggest-x-in-subgroup)
   - [Find RegEx Match in a Text Array](#find-regex-match-in-a-text-array)
-  - [Immutable Columns in SQL](#immutable-columns-in-sql)
-    - [SOLUTION A](#solution-a)
-    - [SOLUTION B](#solution-b)
+- [Immutable Columns in SQL](#immutable-columns-in-sql)
+  - [SOLUTION A](#solution-a)
+  - [SOLUTION B](#solution-b)
 - [Linux Shell / Bash](#linux-shell--bash)
   - [`find` patterns](#find-patterns)
 - [better `df`](#better-df)
   - [Using `dutree`](#using-dutree)
 - [NodeJS](#nodejs)
-  - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
-    - [Pipestreaming Solution](#pipestreaming-solution)
-    - [Node-Readlines](#node-readlines)
-    - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
-  - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
+- [Reading Text Files Line by Line](#reading-text-files-line-by-line)
+  - [Pipestreaming Solution](#pipestreaming-solution)
+  - [Node-Readlines](#node-readlines)
+  - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
+- [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -153,7 +153,7 @@ select FM._array_regex_position( array[ 'foo', 'bar', 'baz' ], 'az' );  -- gives
 
 
 
-### Immutable Columns in SQL
+## Immutable Columns in SQL
 
 In the generic table `datoms`, created below, we want to have a field `stamped`, default `false`, that may
 be set to `true` to indicate the record is outdated and is no longer in use; apart from that, we want to
@@ -204,7 +204,7 @@ absent).
 [InterShop](https://github.com/loveencounterflow/intershop).
 
 
-#### SOLUTION A
+### SOLUTION A
 
 ```sql
 begin transaction;
@@ -263,7 +263,7 @@ do $$ begin
 rollback;
 ```
 
-#### SOLUTION B
+### SOLUTION B
 
 ```sql
 create function IMMUTABLE.on_before_update_datoms() returns trigger language plpgsql as $$ begin
@@ -354,12 +354,12 @@ dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 
 
 
-### Reading Text Files Line by Line
+## Reading Text Files Line by Line
 
 Reading a text file in a linewise fashion is a basic task, yet surprisingly hard to
 accomplish in NodeJS. There are two good solutions:
 
-#### Pipestreaming Solution
+### Pipestreaming Solution
 
 Using basic [PipeStreams](https://github.com/loveencounterflow/pipestreams), the more fully-featured
 [PipeDreams](https://github.com/loveencounterflow/pipedreams), or their successor (and WIP)
@@ -371,7 +371,7 @@ the lines of text become only available within stream transforms, it is not poss
 an iterator. ATM it is not quite clear to me whether building iterators on top of a pipestreaming
 solution is possible at all.
 
-#### Node-Readlines
+### Node-Readlines
 
 Luckily there's the [n-readlines](https://github.com/nacholibre/node-readlines) package. From the blurb:
 
@@ -392,7 +392,7 @@ Usage is simple:
   return null
 ```
 
-#### A Better Solution: InterText SplitLines
+### A Better Solution: InterText SplitLines
 
 A 'better', that is, as-fast-but-more-flexible solution is implemented in
 `src/read-undecoded-lines-from-stdin.coffee`. It uses `intertext-splitlines` to look for occurrences
@@ -431,7 +431,7 @@ use_itxt_splitlines = -> new Promise ( resolve, reject ) =>
 
 
 
-### Avoiding Accidental String Substitutions (so-called A$$es)
+## Avoiding Accidental String Substitutions (so-called A$$es)
 
 JavaScript's `String::replace()` function has that sometimes-useful feature that is replacement patterns in
 the replacement string; for example, when you do `'abc'.replace /(b)/g, '==$1=='`, you'll get `'a==b==c'`.
