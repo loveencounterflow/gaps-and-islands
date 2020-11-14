@@ -18,6 +18,7 @@
     - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
       - [Pipestreaming Solution](#pipestreaming-solution)
       - [Node-Readlines](#node-readlines)
+      - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
     - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -351,36 +352,6 @@ cargo install --git https://github.com/nachoparker/dutree.git
 dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ```
 
-## Python3.6+
-
-### Immutable 'Data Objects'
-
-Python lacks the ability to freeze arbitrary objects; all it provides are structures that are immutable by
-design (strings, tuples) and user-definable classes that produce mutable instances. One way to bring a
-modicum of immutability to the language is demonstrated below, where `__setattr__()` throws unconditionally.
-Observe that this still allows to modify the values of attributes that are mutable data types.
-
-```py
-#-----------------------------------------------------------------------------------------------------------
-class Immutable:
-  def __setattr__( me, *P: Any ) -> None: raise KeyError( "^334^ forbidden to set attribute on immutable" )
-
-#-----------------------------------------------------------------------------------------------------------
-@total_ordering
-class Segment( Immutable ):
-
-  #---------------------------------------------------------------------------------------------------------
-  def __init__( me, lo: int, hi: int ) -> None:
-    me.lo: int                # <-- satisfy MyPy with suitable annotation...
-    me.hi: int                # <-- satisfy MyPy with suitable annotation...
-    me.__dict__[ 'lo' ] = lo  # ... to set attribute via `__dict__`
-    me.__dict__[ 'hi' ] = hi  # ... to set attribute via `__dict__`
-
-  #---------------------------------------------------------------------------------------------------------
-  @property
-  def size( me ) -> int: return me.hi - me.lo + 1
-```
-
 ## NodeJS
 
 
@@ -423,6 +394,41 @@ Usage is simple:
   return null
 ```
 
+#### A Better Solution: InterText SplitLines
+
+A 'better', that is, as-fast-but-more-flexible solution is implemented in
+`src/read-undecoded-lines-from-stdin.coffee`. It uses `intertext-splitlines` to look for occurrences
+of `\x0a` bytes in the `stdin` stream, which is accessed with event handlers. In this sample, we do a bit
+of data processing as my problem at hand was to produce PostgreSQL `bytea` hexadecimal literals. The
+program reads from `stdin` and writes to `stdout`, so one can use it as e.g.
+
+```bash
+time ( cat myinputdata.txt | node lib/read-undecoded-lines-from-stdin.js > /tmp/anything.txt )
+```
+
+```coffee
+use_itxt_splitlines = -> new Promise ( resolve, reject ) =>
+  SL              = require 'intertext-splitlines'
+  { stdin
+    stdout }      = process
+  settings        = { decode: false, keep_newlines: false, }
+  as_hex_literal  = ( buffer ) -> '\\x' + ( buffer.toString 'hex' )
+  ctx             = SL.new_context settings
+  lnr             = 0
+  #.........................................................................................................
+  stdin.on 'data', ( d ) ->
+    for line from SL.walk_lines ctx, d
+      lnr++
+      stdout.write ( "\"dsk\",#{lnr}," ) + ( as_hex_literal line ) + '\n'
+  #.........................................................................................................
+  await process.stdin.once 'end', ->
+    for line from SL.flush ctx
+      lnr++
+      stdout.write ( "\"dsk\",#{lnr}," ) + ( as_hex_literal line ) + '\n'
+      resolve()
+  #.........................................................................................................
+  return null
+```
 
 
 
@@ -451,7 +457,7 @@ be no problem! But it is: as [the
 docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace)
 clearly state:
 
-> `$'`  inserts the portion of the string that follows the matched substring.
+> `$'` [i.e. dollar, quote]  inserts the portion of the string that follows the matched substring.
 
 So when you do `'abc'.replace /(b)/g, "$"`, you get `'a$c'`, no problem indeed. But add a quote as in
 `'abc'.replace /(b)/g, "$'"`, and suddenly the result is `'acc'`.
