@@ -1,31 +1,32 @@
+
+# Gaps and Islands
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Gaps and Islands](#gaps-and-islands)
-  - [SQL](#sql)
-    - [The Gaps-And-Islands Pattern](#the-gaps-and-islands-pattern)
-    - [Maximum Value in Group / Biggest X in Subgroup](#maximum-value-in-group--biggest-x-in-subgroup)
-    - [Find RegEx Match in a Text Array](#find-regex-match-in-a-text-array)
-    - [Immutable Columns in SQL](#immutable-columns-in-sql)
-      - [SOLUTION A](#solution-a)
-      - [SOLUTION B](#solution-b)
-  - [Linux Shell / Bash](#linux-shell--bash)
-    - [`find` patterns](#find-patterns)
-  - [better `df`](#better-df)
-    - [Using `dutree`](#using-dutree)
-  - [NodeJS](#nodejs)
-    - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
-      - [Pipestreaming Solution](#pipestreaming-solution)
-      - [Node-Readlines](#node-readlines)
-      - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
-    - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
+
+- [SQL](#sql)
+  - [The Gaps-And-Islands Pattern](#the-gaps-and-islands-pattern)
+  - [Maximum Value in Group / Biggest X in Subgroup](#maximum-value-in-group--biggest-x-in-subgroup)
+  - [Find RegEx Match in a Text Array](#find-regex-match-in-a-text-array)
+  - [Immutable Columns in SQL](#immutable-columns-in-sql)
+    - [SOLUTION A](#solution-a)
+    - [SOLUTION B](#solution-b)
+- [Linux Shell / Bash](#linux-shell--bash)
+  - [`find` patterns](#find-patterns)
+- [better `df`](#better-df)
+  - [Using `dutree`](#using-dutree)
+- [NodeJS](#nodejs)
+  - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
+    - [Pipestreaming Solution](#pipestreaming-solution)
+    - [Node-Readlines](#node-readlines)
+    - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
+  - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 
-# Gaps and Islands
 
 ## SQL
 
