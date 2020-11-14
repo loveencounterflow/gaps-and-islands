@@ -6,9 +6,9 @@
 This part to be updated by running `doctoc REDME.md`
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## SQL
+# SQL
 
-### The Gaps-And-Islands Pattern
+## The Gaps-And-Islands Pattern
 
 * https://stackoverflow.com/questions/17046204/how-to-find-the-boundaries-of-groups-of-contiguous-sequential-numbers
 * https://stackoverflow.com/questions/tagged/gaps-and-islands
@@ -20,7 +20,7 @@ This part to be updated by running `doctoc REDME.md`
 
 ```
 
-### Maximum Value in Group / Biggest X in Subgroup
+## Maximum Value in Group / Biggest X in Subgroup
 
 https://stackoverflow.com/a/8749095
 
@@ -44,7 +44,7 @@ create view combifont as select
 ```
 
 
-### Find RegEx Match in a Text Array
+## Find RegEx Match in a Text Array
 
 Postgres has `array_position( a, v )` to locate the first occurrence of a given value `v` in an array `a`;
 there is no corresponding function to do the same matching a regular expression againts an array of texts.
@@ -65,9 +65,9 @@ select FM._array_regex_position( array[ 'foo', 'bar', 'baz' ], 'az' );  -- gives
 
 <insert src='./immutable-columns-in-sql.md'/>
 
-## Linux Shell / Bash
+# Linux Shell / Bash
 
-### `find` patterns
+## `find` patterns
 
 find all files by name, matching any pattern:
 
@@ -81,7 +81,7 @@ find all files resolving symlinks, print out as size, space, path:
 find -L ~/jzr -type f -printf "%s %p\n" | less -SRN
 ```
 
-## better `df`
+# better `df`
 
 List all drives, inlcuding unmounted:
 ```bash
@@ -95,7 +95,7 @@ lsblk --all --bytes --fs --paths --json
 lsblk --all --bytes --fs --paths --list
 ```
 
-### Using `dutree`
+## Using `dutree`
 
 ```bash
 sudo curl https://sh.rustup.rs -sSf | sh
@@ -107,7 +107,7 @@ cargo install --git https://github.com/nachoparker/dutree.git
 dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ```
 
-## NodeJS
+# NodeJS
 
 <insert src='./reading-file-lines.md'/>
 <insert src='./avoiding-accidental-string-substitutions.md'/>
