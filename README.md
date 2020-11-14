@@ -9,25 +9,25 @@ This part to be updated by running `doctoc REDME.md`
   - [The Gaps-And-Islands Pattern](#the-gaps-and-islands-pattern)
   - [Maximum Value in Group / Biggest X in Subgroup](#maximum-value-in-group--biggest-x-in-subgroup)
   - [Find RegEx Match in a Text Array](#find-regex-match-in-a-text-array)
-- [Immutable Columns in SQL](#immutable-columns-in-sql)
-  - [SOLUTION A](#solution-a)
-  - [SOLUTION B](#solution-b)
+  - [Immutable Columns in SQL](#immutable-columns-in-sql)
+    - [SOLUTION A](#solution-a)
+    - [SOLUTION B](#solution-b)
 - [Linux Shell / Bash](#linux-shell--bash)
   - [`find` patterns](#find-patterns)
 - [better `df`](#better-df)
   - [Using `dutree`](#using-dutree)
 - [NodeJS](#nodejs)
-- [Reading Text Files Line by Line](#reading-text-files-line-by-line)
-  - [Pipestreaming Solution](#pipestreaming-solution)
-  - [Node-Readlines](#node-readlines)
-  - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
-- [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
+  - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
+    - [Pipestreaming Solution](#pipestreaming-solution)
+    - [Node-Readlines](#node-readlines)
+    - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
+  - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## SQL
+# SQL
 
-### The Gaps-And-Islands Pattern
+## The Gaps-And-Islands Pattern
 
 * https://stackoverflow.com/questions/17046204/how-to-find-the-boundaries-of-groups-of-contiguous-sequential-numbers
 * https://stackoverflow.com/questions/tagged/gaps-and-islands
@@ -108,7 +108,7 @@ select * from ranges_ala_bengan;
 
 ```
 
-### Maximum Value in Group / Biggest X in Subgroup
+## Maximum Value in Group / Biggest X in Subgroup
 
 https://stackoverflow.com/a/8749095
 
@@ -132,7 +132,7 @@ order by iclabel, styletag;
 ```
 
 
-### Find RegEx Match in a Text Array
+## Find RegEx Match in a Text Array
 
 Postgres has `array_position( a, v )` to locate the first occurrence of a given value `v` in an array `a`;
 there is no corresponding function to do the same matching a regular expression againts an array of texts.
@@ -308,9 +308,9 @@ rollback;
 
 
 
-## Linux Shell / Bash
+# Linux Shell / Bash
 
-### `find` patterns
+## `find` patterns
 
 find all files by name, matching any pattern:
 
@@ -324,7 +324,7 @@ find all files resolving symlinks, print out as size, space, path:
 find -L ~/jzr -type f -printf "%s %p\n" | less -SRN
 ```
 
-## better `df`
+# better `df`
 
 List all drives, inlcuding unmounted:
 ```bash
@@ -338,7 +338,7 @@ lsblk --all --bytes --fs --paths --json
 lsblk --all --bytes --fs --paths --list
 ```
 
-### Using `dutree`
+## Using `dutree`
 
 ```bash
 sudo curl https://sh.rustup.rs -sSf | sh
@@ -350,7 +350,7 @@ cargo install --git https://github.com/nachoparker/dutree.git
 dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ```
 
-## NodeJS
+# NodeJS
 
 
 
