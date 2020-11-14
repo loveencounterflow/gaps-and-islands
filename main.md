@@ -6,6 +6,7 @@
 This part to be updated by running `doctoc REDME.md`
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+
 # SQL
 
 ## The Gaps-And-Islands Pattern
@@ -64,6 +65,7 @@ select FM._array_regex_position( array[ 'foo', 'bar', 'baz' ], 'az' );  -- gives
 ```
 
 <insert src='./immutable-columns-in-sql.md'/>
+
 
 # Linux Shell / Bash
 

@@ -23,12 +23,12 @@ echo                      = ( text ) -> _echo text.replace /\n$/, ''
 PATH                      = require 'path'
 FSP                       = ( require 'fs' ).promises
 PGT                       = require 'paragate'
-join                      = ( me, P... ) -> PATH.resolve PATH.join me.base_path, P...
-read                      = ( me, path ) -> await FSP.readFile path, { encoding: 'utf-8', }
-clear                     = ( me ) -> await FSP.writeFile me.target_path, ''
-write                     = ( me, text ) -> await FSP.appendFile me.target_path, text.toString()
-comment                   = ( text ) -> '<!-- ' + ( text.toString().replace /--/g, '-_' ) + ' -->\n'
-unquote                   = ( text ) -> text.replace /^(['"])(.*)\1$/, '$2'
+join                      = ( me, P...  ) -> PATH.resolve PATH.join me.base_path, P...
+read                      = ( me, path  ) -> await FSP.readFile path, { encoding: 'utf-8', }
+clear                     = ( me        ) -> await FSP.writeFile me.target_path, ''
+write                     = ( me, text  ) -> await FSP.appendFile me.target_path, text.toString()
+comment                   = ( text      ) -> '<!-- ' + ( text.toString().replace /--/g, '-_' ) + ' -->\n'
+unquote                   = ( text      ) -> text.replace /^(['"])(.*)\1$/, '$2'
 
 #-----------------------------------------------------------------------------------------------------------
 @interpret_inserts = ( me, token ) ->
@@ -63,10 +63,10 @@ unquote                   = ( text ) -> text.replace /^(['"])(.*)\1$/, '$2'
       when '^blank'
         await write me, d.text
       when '^block'
-        unless d.text.startsWith '<insert'
-          await write me, d.text
+        if d.text.startsWith '<insert'
+          await @interpret_inserts me, d
           continue
-        await @interpret_inserts me, d
+        await write me, d.text
       else throw new Error "^4776^ unknown token $key #{rpr d.$key}"
   return me
 
