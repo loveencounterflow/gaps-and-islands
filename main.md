@@ -119,6 +119,9 @@ dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 <insert src='./css.md'/>
 
 
+# CoffeeScript
+
+<insert src='./coffeescript-class-instance-properties.md'/>
 
 
 
