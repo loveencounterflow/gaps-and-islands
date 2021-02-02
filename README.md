@@ -22,6 +22,7 @@ This part to be updated by running `doctoc REDME.md`
     - [Node-Readlines](#node-readlines)
     - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
   - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
+  - [Event Emitter as Async Generator](#event-emitter-as-async-generator)
 - [CSS](#css)
   - [CSS Variables with User Settings, Defaults](#css-variables-with-user-settings-defaults)
 - [CoffeeScript](#coffeescript)
@@ -494,10 +495,11 @@ sql   = sql_template.replace /\?glyphs\?/g, -> glyphs_tuple
 ```
 
 
+## Event Emitter as Async Generator
 
+(blob/master/src/event-emitter-as-async-generator/main.coffee)[event-emitter-as-async-generator]
 
-
-
+This idea has been turned into a NodeJS module, [JfEE](https://github.com/loveencounterflow/jfee).
 
 # CSS
 
