@@ -16,6 +16,7 @@ This part to be updated by running `doctoc REDME.md`
   - [`find` patterns](#find-patterns)
 - [better `df`](#better-df)
   - [Using `dutree`](#using-dutree)
+  - [Bash Script for Cross-OS Temporary Directories](#bash-script-for-cross-os-temporary-directories)
 - [NodeJS](#nodejs)
   - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
     - [Pipestreaming Solution](#pipestreaming-solution)
@@ -357,6 +358,23 @@ cargo install --git https://github.com/nachoparker/dutree.git
 ```bash
 dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ```
+
+## Bash Script for Cross-OS Temporary Directories
+
+From
+[`unix.stackexchange`](https://unix.stackexchange.com/questions/30091/fix-or-alternative-for-mktemp-in-os-x):
+
+> [T]he following is what I ended up using to reliably create a temporary directory that works on both Linux
+> and Darwin (Mac OS X), without hardcoding either `$TMPDIR` or `/tmp`:
+>
+> ```sh
+> mytmpdir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
+> ```
+>
+> The first part is for Linux. This command will fail on Darwin (Mac OS X) with error status code `1`
+> responding with "usage: ...". That's why we ignore stderr and instead then execute the Mac variant. The
+> `mytmpdir` prefix is only used on Mac (where that option is required to be set).
+
 
 # NodeJS
 
