@@ -29,6 +29,7 @@ This part to be updated by running `doctoc REDME.md`
 - [CoffeeScript](#coffeescript)
   - [Properties with Getters and Setters for (ES6) Classes](#properties-with-getters-and-setters-for-es6-classes)
   - [Mixins](#mixins)
+  - [Callable Instances](#callable-instances)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -701,7 +702,19 @@ if module is require.main then do =>
 
 ```
 
+## Callable Instances
 
+```coffee
+class Myclass extends Function
+
+  constructor: ->
+    super()
+    Object.setPrototypeOf @mymethod, Myclass.prototype
+    return @mymethod
+
+  mymethod: ( ... ) => ...
+
+```
 
 
 
