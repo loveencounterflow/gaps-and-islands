@@ -109,11 +109,29 @@ cargo install --git https://github.com/nachoparker/dutree.git
 dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ```
 
+## Bash Script for Cross-OS Temporary Directories
+
+From
+[`unix.stackexchange`](https://unix.stackexchange.com/questions/30091/fix-or-alternative-for-mktemp-in-os-x):
+
+> [T]he following is what I ended up using to reliably create a temporary directory that works on both Linux
+> and Darwin (Mac OS X), without hardcoding either `$TMPDIR` or `/tmp`:
+>
+> ```sh
+> mytmpdir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
+> ```
+>
+> The first part is for Linux. This command will fail on Darwin (Mac OS X) with error status code `1`
+> responding with "usage: ...". That's why we ignore stderr and instead then execute the Mac variant. The
+> `mytmpdir` prefix is only used on Mac (where that option is required to be set).
+
 # NodeJS
 
 <insert src='./reading-file-lines.md'/>
 <insert src='./avoiding-accidental-string-substitutions.md'/>
-
+<insert src='./event-emitter-as-async-generator.md'/>
+<insert src='./mixins.md'/>
+<insert src='./callable-instances.md'/>
 
 
 <insert src='./css.md'/>

@@ -16,20 +16,16 @@ This part to be updated by running `doctoc REDME.md`
   - [`find` patterns](#find-patterns)
 - [better `df`](#better-df)
   - [Using `dutree`](#using-dutree)
-  - [Bash Script for Cross-OS Temporary Directories](#bash-script-for-cross-os-temporary-directories)
 - [NodeJS](#nodejs)
   - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
     - [Pipestreaming Solution](#pipestreaming-solution)
     - [Node-Readlines](#node-readlines)
     - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
   - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
-  - [Event Emitter as Async Generator](#event-emitter-as-async-generator)
 - [CSS](#css)
   - [CSS Variables with User Settings, Defaults](#css-variables-with-user-settings-defaults)
 - [CoffeeScript](#coffeescript)
   - [Properties with Getters and Setters for (ES6) Classes](#properties-with-getters-and-setters-for-es6-classes)
-  - [Mixins](#mixins)
-  - [Callable Instances](#callable-instances)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -360,23 +356,6 @@ cargo install --git https://github.com/nachoparker/dutree.git
 dutree --no-hidden --depth=2 --aggr=10M ~/jzr/ | less -SRN
 ```
 
-## Bash Script for Cross-OS Temporary Directories
-
-From
-[`unix.stackexchange`](https://unix.stackexchange.com/questions/30091/fix-or-alternative-for-mktemp-in-os-x):
-
-> [T]he following is what I ended up using to reliably create a temporary directory that works on both Linux
-> and Darwin (Mac OS X), without hardcoding either `$TMPDIR` or `/tmp`:
->
-> ```sh
-> mytmpdir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
-> ```
->
-> The first part is for Linux. This command will fail on Darwin (Mac OS X) with error status code `1`
-> responding with "usage: ...". That's why we ignore stderr and instead then execute the Mac variant. The
-> `mytmpdir` prefix is only used on Mac (where that option is required to be set).
-
-
 # NodeJS
 
 
@@ -515,14 +494,9 @@ sql   = sql_template.replace /\?glyphs\?/g, -> glyphs_tuple
 ```
 
 
-## Event Emitter as Async Generator
 
-In (blob/master/src/event-emitter-as-async-generator/main.coffee)[event-emitter-as-async-generator], we
-demonstrate how to turn a NodeJS `EventEmitter` into an asynchronous iterator. The solution is based on
-StackOverflow user [mpen](https://stackoverflow.com/users/65387/mpen)'s
-[suggestion](https://stackoverflow.com/a/59347615/7568091) how to do such a thing, and the idea has been
-turned into a NodeJS module, [JfEE](https://github.com/loveencounterflow/jfee); this, in turn, has made the
-implementation of SteamPipes' `source_from_child_process()` possible.
+
+
 
 
 # CSS
@@ -653,68 +627,9 @@ but whether that is worth the trouble is another question. See
 
 
 
-## Mixins
-
-* Thx to https://alligator.io/js/class-composition/
-* Write mixins as functions that take an optional `clasz` argument which defaults to `Object` (or a custom
-  `Base` class).
-* Extend the top level class from a call chain of the mixins.
-* In CoffeeScript, one can omit the braces for all calls except the final one.
-* Can also write `class Main extends B_mixin A_mixin Object` instead of `class Main extends B_mixin
-  A_mixin()`, The advantage being that the presence of `Object` gives a hint about the directionality of
-  mixin application (important in the case of shadowing).
-
-```coffee
-
-#-----------------------------------------------------------------------------------------------------------
-A_mixin = ( clasz = Object ) => class extends clasz
-  constructor: ->
-    super()
-    # help '^343-1^', known_names = new Set ( k for k of @ )
-    @a_mixin  = true
-    @name     = 'a_mixin'
-
-  introduce_yourself: -> urge "helo from class #{@name}"
-
-#-----------------------------------------------------------------------------------------------------------
-B_mixin = ( clasz = Object ) => class extends clasz
-  constructor: ->
-    super()
-    # help '^343-2^', known_names = new Set ( k for k of @ )
-    @b_mixin  = true
-    @name     = 'b_mixin'
 
 
-#-----------------------------------------------------------------------------------------------------------
-class Main extends B_mixin A_mixin()
-  constructor: ->
-    super()
-    @main     = true
-    @name     = 'main'
 
-
-############################################################################################################
-if module is require.main then do =>
-  d = new Main()
-  d.introduce_yourself()
-
-  # helo from class main
-
-```
-
-## Callable Instances
-
-```coffee
-class Myclass extends Function
-
-  constructor: ->
-    super()
-    Object.setPrototypeOf @mymethod, Myclass.prototype
-    return @mymethod
-
-  mymethod: ( ... ) => ...
-
-```
 
 
 
