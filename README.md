@@ -629,6 +629,9 @@ Unfortunately it turns out that the `Atomics` API is quite hard to use by itself
 > says so. See [*A cartoon intro to SharedArrayBuffers Articles* by Lin Clark (June
 > 2017)](https://hacks.mozilla.org/category/code-cartoons/a-cartoon-intro-to-sharedarraybuffers/) for a
 > thorough discussion.
+>
+> For a shorter yet very readable intro to `Atomics.wait()` and friends, see [*Shared memory - a brief
+> tutorial*](https://github.com/tc39/ecmascript_sharedmem/blob/master/TUTORIAL.md).
 
 In
 [`hengist/async-to-sync-with-atomics-wait`](https://github.com/loveencounterflow/hengist/blob/master/dev/snippets/src/async-to-sync-with-atomics-wait.coffee)
