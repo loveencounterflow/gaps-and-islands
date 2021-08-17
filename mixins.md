@@ -47,18 +47,3 @@ if module is require.main then do =>
   # helo from class main
 
 ```
-
-## Callable Instances
-
-```coffee
-class Myclass extends Function
-
-  constructor: ->
-    super()
-    Object.setPrototypeOf @mymethod, Myclass.prototype
-    return @mymethod
-
-  mymethod: ( ... ) => ...
-
-```
-
