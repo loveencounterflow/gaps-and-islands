@@ -26,13 +26,13 @@ See
 > done.—[*A future for SQL on the web* by James Long (August 12,
 > 2021)](https://jlongster.com/future-sql-web)
 
-Unfortunately it turns out that the `Atomics` API is quite hard to use by itself; this is definitely
-something I can agree with [*Avoiding race conditions in SharedArrayBuffers with Atomics* by Lin Clark (June
-2017)](https://hacks.mozilla.org/2017/06/avoiding-race-conditions-in-sharedarraybuffers-with-atomics/).
+Unfortunately it turns out that the `Atomics` API is quite hard to use by itself.
 
-> Also probably a good read: The entire series [*A cartoon intro to SharedArrayBuffers Articles* by Lin
-> Clark (June
-> 2017)](https://hacks.mozilla.org/category/code-cartoons/a-cartoon-intro-to-sharedarraybuffers/)
+> [Lin
+> Clark](https://hacks.mozilla.org/2017/06/avoiding-race-conditions-in-sharedarraybuffers-with-atomics/)
+> says so. See [*A cartoon intro to SharedArrayBuffers Articles* by Lin Clark (June
+> 2017)](https://hacks.mozilla.org/category/code-cartoons/a-cartoon-intro-to-sharedarraybuffers/) for a
+> thorough discussion.
 
 In
 [`hengist/async-to-sync-with-atomics-wait`](https://github.com/loveencounterflow/hengist/blob/master/dev/snippets/src/async-to-sync-with-atomics-wait.coffee)
