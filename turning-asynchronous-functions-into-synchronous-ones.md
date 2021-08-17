@@ -36,8 +36,9 @@ Unfortunately it turns out that the `Atomics` API is quite hard to use by itself
 
 In
 [`hengist/async-to-sync-with-atomics-wait`](https://github.com/loveencounterflow/hengist/blob/master/dev/snippets/src/async-to-sync-with-atomics-wait.coffee)
-I tried to get a working solution but didn't quite succeed. What did work immediately is
-[`abbr/deasync`](https://github.com/abbr/deasync); here's a code sample:
+I tried to get a working solution but didn't quite succeed.
+
+What *did* work immediately is [`abbr/deasync`](https://github.com/abbr/deasync); here's a code sample:
 
 ```coffee
 #-----------------------------------------------------------------------------------------------------------
