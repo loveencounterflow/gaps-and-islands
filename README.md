@@ -18,14 +18,15 @@ This part to be updated by running `doctoc REDME.md`
   - [Using `dutree`](#using-dutree)
   - [Bash Script for Cross-OS Temporary Directories](#bash-script-for-cross-os-temporary-directories)
 - [NodeJS](#nodejs)
+  - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
+  - [Mixins](#mixins)
+  - [Callable Instances](#callable-instances)
   - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
     - [Pipestreaming Solution](#pipestreaming-solution)
     - [Node-Readlines](#node-readlines)
     - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
-  - [Avoiding Accidental String Substitutions (so-called A$$es)](#avoiding-accidental-string-substitutions-so-called-aes)
   - [Event Emitter as Async Generator](#event-emitter-as-async-generator)
-  - [Mixins](#mixins)
-  - [Callable Instances](#callable-instances)
+  - [Turning Asynchronous functions into Synchronous ones](#turning-asynchronous-functions-into-synchronous-ones)
 - [CSS](#css)
   - [CSS Variables with User Settings, Defaults](#css-variables-with-user-settings-defaults)
 - [CoffeeScript](#coffeescript)
@@ -379,6 +380,132 @@ From
 # NodeJS
 
 
+## Avoiding Accidental String Substitutions (so-called A$$es)
+
+JavaScript's `String::replace()` function has that sometimes-useful feature that is replacement patterns in
+the replacement string; for example, when you do `'abc'.replace /(b)/g, '==$1=='`, you'll get `'a==b==c'`.
+
+Less thoughts are often spent on that feature opening a startling backdoor for things to go wrong: Of
+course, if some characters in the replacement may trigger special feature, that means that inevitably there
+will be times when all goes well until some kind of unexpected input cause weird things to happen.
+
+Today that happened to me. Due to my SQL adapter not accepting SQL values tuples (that you need for queries
+like `select * from t where x in ( 'a', 'b', 'c' )`), I had to roll my own. That wasn't too hard given that
+I had already implemented basic SQL value interpolation for a related project:
+
+```coffee
+glyphs_tuple  = generate_sql_values_tuple glyphs
+sql           = sql_template.replace /\?glyphs\?/g, glyphs_tuple
+```
+
+Now that query had already run thousands of times without problems—but today was the first time the `glyphs`
+variable contained a `$` dollar sign; the `glyphs_tuple` then looked like `( '#', '!', '$', '%' )`. Should
+be no problem! But it is: as [the
+docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace)
+clearly state:
+
+> `$'` [i.e. dollar, quote]  inserts the portion of the string that follows the matched substring.
+
+So when you do `'abc'.replace /(b)/g, "$"`, you get `'a$c'`, no problem indeed. But add a quote as in
+`'abc'.replace /(b)/g, "$'"`, and suddenly the result is `'acc'`.
+
+This particular aspect—that only *some* sequences cause special behavior—makes the feature even more
+insidious. Even worse, `'abc'.replace /(b)/g, "$1"` gives `'abc'` as expected, but any number beyond `1` is
+not special, so `'abc'.replace /(b)/g, "$2"` gives `'a$2c'` and so. This is because there is no second group
+in *this* pattern; use another pattern with two groups and `$2` *will* become special.
+
+Now, this isn't rocket science, but certainly obnoxious. Because the odds are so small that a random string
+will contain one of the problematic sequences, likewise, the odds are small that you'd even catch this with
+testing unless you're throwing insane amounts of test data against each `replace()` instance.
+
+It's probably better to heed this piecve of advice:
+
+> If a feature is sometimes useful and sometimes dangerous and if there is a better option then always use
+> the better option.—[D. Crockford](https://blog.gisspan.com/2016/07/Constructor-Vs-Factory.html)
+
+Luckily, There's a way out: use a function: As per the docs, `String.replace ( ... ) -> ...` is free from
+these surprising effects:
+
+> [t]he function's result (return value) will be used as the replacement string. [...] [t]he [...] special
+> replacement patterns do not apply in this case.)
+
+Therefore, the fix is simple:
+
+```coffee
+# sql = sql_template.replace /\?glyphs\?/g,    glyphs_tuple
+sql   = sql_template.replace /\?glyphs\?/g, -> glyphs_tuple
+```
+
+
+
+
+
+## Mixins
+
+* Thx to https://alligator.io/js/class-composition/
+* Write mixins as functions that take an optional `clasz` argument which defaults to `Object` (or a custom
+  `Base` class).
+* Extend the top level class from a call chain of the mixins.
+* In CoffeeScript, one can omit the braces for all calls except the final one.
+* Can also write `class Main extends B_mixin A_mixin Object` instead of `class Main extends B_mixin
+  A_mixin()`, The advantage being that the presence of `Object` gives a hint about the directionality of
+  mixin application (important in the case of shadowing).
+
+```coffee
+
+#-----------------------------------------------------------------------------------------------------------
+A_mixin = ( clasz = Object ) => class extends clasz
+  constructor: ->
+    super()
+    # help '^343-1^', known_names = new Set ( k for k of @ )
+    @a_mixin  = true
+    @name     = 'a_mixin'
+
+  introduce_yourself: -> urge "helo from class #{@name}"
+
+#-----------------------------------------------------------------------------------------------------------
+B_mixin = ( clasz = Object ) => class extends clasz
+  constructor: ->
+    super()
+    # help '^343-2^', known_names = new Set ( k for k of @ )
+    @b_mixin  = true
+    @name     = 'b_mixin'
+
+
+#-----------------------------------------------------------------------------------------------------------
+class Main extends B_mixin A_mixin()
+  constructor: ->
+    super()
+    @main     = true
+    @name     = 'main'
+
+
+############################################################################################################
+if module is require.main then do =>
+  d = new Main()
+  d.introduce_yourself()
+
+  # helo from class main
+
+```
+
+
+## Callable Instances
+
+```coffee
+class Myclass extends Function
+
+  constructor: ->
+    super()
+    Object.setPrototypeOf @mymethod, Myclass.prototype
+    return @mymethod
+
+  mymethod: ( ... ) => ...
+
+```
+
+
+
 
 ## Reading Text Files Line by Line
 
@@ -457,66 +584,6 @@ use_itxt_splitlines = -> new Promise ( resolve, reject ) =>
 
 
 
-## Avoiding Accidental String Substitutions (so-called A$$es)
-
-JavaScript's `String::replace()` function has that sometimes-useful feature that is replacement patterns in
-the replacement string; for example, when you do `'abc'.replace /(b)/g, '==$1=='`, you'll get `'a==b==c'`.
-
-Less thoughts are often spent on that feature opening a startling backdoor for things to go wrong: Of
-course, if some characters in the replacement may trigger special feature, that means that inevitably there
-will be times when all goes well until some kind of unexpected input cause weird things to happen.
-
-Today that happened to me. Due to my SQL adapter not accepting SQL values tuples (that you need for queries
-like `select * from t where x in ( 'a', 'b', 'c' )`), I had to roll my own. That wasn't too hard given that
-I had already implemented basic SQL value interpolation for a related project:
-
-```coffee
-glyphs_tuple  = generate_sql_values_tuple glyphs
-sql           = sql_template.replace /\?glyphs\?/g, glyphs_tuple
-```
-
-Now that query had already run thousands of times without problems—but today was the first time the `glyphs`
-variable contained a `$` dollar sign; the `glyphs_tuple` then looked like `( '#', '!', '$', '%' )`. Should
-be no problem! But it is: as [the
-docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace)
-clearly state:
-
-> `$'` [i.e. dollar, quote]  inserts the portion of the string that follows the matched substring.
-
-So when you do `'abc'.replace /(b)/g, "$"`, you get `'a$c'`, no problem indeed. But add a quote as in
-`'abc'.replace /(b)/g, "$'"`, and suddenly the result is `'acc'`.
-
-This particular aspect—that only *some* sequences cause special behavior—makes the feature even more
-insidious. Even worse, `'abc'.replace /(b)/g, "$1"` gives `'abc'` as expected, but any number beyond `1` is
-not special, so `'abc'.replace /(b)/g, "$2"` gives `'a$2c'` and so. This is because there is no second group
-in *this* pattern; use another pattern with two groups and `$2` *will* become special.
-
-Now, this isn't rocket science, but certainly obnoxious. Because the odds are so small that a random string
-will contain one of the problematic sequences, likewise, the odds are small that you'd even catch this with
-testing unless you're throwing insane amounts of test data against each `replace()` instance.
-
-It's probably better to heed this piecve of advice:
-
-> If a feature is sometimes useful and sometimes dangerous and if there is a better option then always use
-> the better option.—[D. Crockford](https://blog.gisspan.com/2016/07/Constructor-Vs-Factory.html)
-
-Luckily, There's a way out: use a function: As per the docs, `String.replace ( ... ) -> ...` is free from
-these surprising effects:
-
-> [t]he function's result (return value) will be used as the replacement string. [...] [t]he [...] special
-> replacement patterns do not apply in this case.)
-
-Therefore, the fix is simple:
-
-```coffee
-# sql = sql_template.replace /\?glyphs\?/g,    glyphs_tuple
-sql   = sql_template.replace /\?glyphs\?/g, -> glyphs_tuple
-```
-
-
-
-
-
 ## Event Emitter as Async Generator
 
 In (blob/master/src/event-emitter-as-async-generator/main.coffee)[event-emitter-as-async-generator], we
@@ -528,69 +595,87 @@ implementation of SteamPipes' `source_from_child_process()` possible.
 
 
 
-## Mixins
+## Turning Asynchronous functions into Synchronous ones
 
-* Thx to https://alligator.io/js/class-composition/
-* Write mixins as functions that take an optional `clasz` argument which defaults to `Object` (or a custom
-  `Base` class).
-* Extend the top level class from a call chain of the mixins.
-* In CoffeeScript, one can omit the braces for all calls except the final one.
-* Can also write `class Main extends B_mixin A_mixin Object` instead of `class Main extends B_mixin
-  A_mixin()`, The advantage being that the presence of `Object` gives a hint about the directionality of
-  mixin application (important in the case of shadowing).
+
+See
+  * [*A future for SQL on the web*](https://lobste.rs/s/1ylnel/future_for_sql_on_web)
+  * [*A future for SQL on the web* by James Long (August 12, 2021)](https://jlongster.com/future-sql-web)
+
+> The biggest problem is when sqlite does a read or write, the API is totally synchronous because it’s based
+> on the C API. Accessing IndexedDB is always async, so how do we get around that?
+>
+> We spawn a worker process and give it a SharedArrayBuffer and then use the
+> [`Atomics`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics) API
+> to communicate via the buffer. For example, our backend writes a read request into the shared buffer, and
+> the worker reads it, performs the read async, and then writes the result back.
+>
+> I wrote a small [channel
+> abstraction](https://github.com/jlongster/absurd-sql/blob/master/src/indexeddb/shared-channel.js) to send
+> different types of data across a SharedArrayBuffer.
+>
+> The real magic is the
+> [`Atomics.wait`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics/wait)
+> API. It’s a beautiful thing. When you call it, it completely blocks JS until the condition is met. You use
+> it to wait on some data in the SharedArrayBuffer, and this is what enables us to turn the async read/write
+> into a sync one. The backend calls it to wait on the result from the worker and blocks until it’s
+> done.—[*A future for SQL on the web* by James Long (August 12,
+> 2021)](https://jlongster.com/future-sql-web)
+
+Unfortunately it turns out that the `Atomics` API is quite hard to use by itself; this is definitely
+something I can agree with [*Avoiding race conditions in SharedArrayBuffers with Atomics* by Lin Clark (June
+2017)](https://hacks.mozilla.org/2017/06/avoiding-race-conditions-in-sharedarraybuffers-with-atomics/).
+
+> Also probably a good read: The entire series [*A cartoon intro to SharedArrayBuffers Articles* by Lin
+> Clark (June
+> 2017)](https://hacks.mozilla.org/category/code-cartoons/a-cartoon-intro-to-sharedarraybuffers/)
+
+In
+[`hengist/async-to-sync-with-atomics-wait`](https://github.com/loveencounterflow/hengist/blob/master/dev/snippets/src/async-to-sync-with-atomics-wait.coffee)
+I tried to get a working solution but didn't quite succeed. What did work immediately is
+[`abbr/deasync`](https://github.com/abbr/deasync); here's a code sample:
 
 ```coffee
-
 #-----------------------------------------------------------------------------------------------------------
-A_mixin = ( clasz = Object ) => class extends clasz
-  constructor: ->
-    super()
-    # help '^343-1^', known_names = new Set ( k for k of @ )
-    @a_mixin  = true
-    @name     = 'a_mixin'
-
-  introduce_yourself: -> urge "helo from class #{@name}"
-
-#-----------------------------------------------------------------------------------------------------------
-B_mixin = ( clasz = Object ) => class extends clasz
-  constructor: ->
-    super()
-    # help '^343-2^', known_names = new Set ( k for k of @ )
-    @b_mixin  = true
-    @name     = 'b_mixin'
-
-
-#-----------------------------------------------------------------------------------------------------------
-class Main extends B_mixin A_mixin()
-  constructor: ->
-    super()
-    @main     = true
-    @name     = 'main'
+demo_deasync_2 = ->
+  after                 = ( dts, f ) -> setTimeout  f, dts * 1000
+  deasync_callbackable  = require 'deasync'
+  #.........................................................................................................
+  deasync_awaitable = ( fn_with_promise ) ->
+    return deasync_callbackable ( handler ) =>
+      result = await fn_with_promise()
+      handler null, result
+      return null
+  #.........................................................................................................
+  frob_async = -> new Promise ( resolve ) =>
+    after 1, -> warn '^455-1^', "frob_async done"; resolve()
+  #.........................................................................................................
+  frob_sync = deasync_awaitable frob_async
+  frob_sync()
+  info '^455-3^', "call to frob_sync done"
+  return null
 
 
 ############################################################################################################
 if module is require.main then do =>
-  d = new Main()
-  d.introduce_yourself()
-
-  # helo from class main
-
+  demo_deasync_2()
+  urge '^803-1^', "demo_deasync_2 done"
 ```
 
-
-## Callable Instances
-
-```coffee
-class Myclass extends Function
-
-  constructor: ->
-    super()
-    Object.setPrototypeOf @mymethod, Myclass.prototype
-    return @mymethod
-
-  mymethod: ( ... ) => ...
+On its own, `deasync` will only accept async functions that keep to the NodeJS custom of making async
+functions accept a callback function as last argument that will call the callback with an optional error
+first and result value last. It is straightforward to convert `Promise`-based functions to that style, so
+that's what I did above. Note the output of the above is
 
 ```
+^455-1^ frob_async done
+^455-3^ call to frob_sync done
+^803-1^ demo_deasync_2 done
+```
+
+which means that indeed although `frob_async()` uses `setTimeout()`, it can be called (in its wrapped
+incarnation) without an explicit callback or `await` and still behave like a synchronous function.
+
 
 
 

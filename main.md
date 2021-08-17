@@ -127,11 +127,12 @@ From
 
 # NodeJS
 
-<insert src='./reading-file-lines.md'/>
 <insert src='./avoiding-accidental-string-substitutions.md'/>
-<insert src='./event-emitter-as-async-generator.md'/>
 <insert src='./mixins.md'/>
 <insert src='./callable-instances.md'/>
+<insert src='./reading-file-lines.md'/>
+<insert src='./event-emitter-as-async-generator.md'/>
+<insert src='./turning-asynchronous-functions-into-synchronous-ones.md'/>
 
 
 <insert src='./css.md'/>
