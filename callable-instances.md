@@ -20,37 +20,24 @@ Similarly, DB transactions should either `commit` or `rollback` depending on whe
 the kernel.
 
 ```coffee
-class Context_manager extends Function          # class extends Function
+class Context_manager extends Function
 
-  constructor: ( kernel ) ->
+  constructor: ( cfg ) ->
     super()
-    kernel = kernel.bind @                      # bind kernel to instance
-    manager = ( P... ) =>                       # formulate managing method ...
-      @enter P...
-      try R = kernel P... finally @exit P...
-      return R
-    return manager                              # ... and make it the constructor's return value
+    @cfg = cfg
+    return @manage
 
-  enter: ( P... ) ->
-    ### acquire resources ###
-    return null
+  enter: ( rtas... ) -> null
 
-  exit: ( P... ) ->
-    ### release resources ###
-    return null
+  exit: ( cx_value, rtas... ) -> null
+
+  manage: ( foo, bar, rtas..., block ) =>
+    validate.function block
+    cx_value = @enter rtas...
+    try
+      block_value = block.call @, cx_value, rtas...
+    finally
+      @exit cx_value, rtas...
+    return block_value
 ```
 
-<!--
-```coffee
-class Myclass extends Function
-
-  constructor: ->
-    super()
-    Object.setPrototypeOf @mymethod, Myclass.prototype
-    return @mymethod
-
-  mymethod: ( ... ) => ...
-
-```
-
- -->
