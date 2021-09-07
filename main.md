@@ -142,6 +142,7 @@ From
 # CoffeeScript
 
 <insert src='./coffeescript-class-instance-properties.md'/>
+<insert src='./coffeescript-types-and-constants-per-class-instance.md'/>
 
 
 
