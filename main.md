@@ -133,6 +133,7 @@ From
 <insert src='./reading-file-lines.md'/>
 <insert src='./event-emitter-as-async-generator.md'/>
 <insert src='./turning-asynchronous-functions-into-synchronous-ones.md'/>
+<insert src='./context-managers.md'/>
 
 
 <insert src='./css.md'/>
