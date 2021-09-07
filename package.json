@@ -1,6 +1,6 @@
 {
   "name": "gaps-and-islands",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Scattered notes on programming patterns in SQL, NodeJS, and Bash",
   "main": "lib/main.js",
   "repository": {
