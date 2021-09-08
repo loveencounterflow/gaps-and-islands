@@ -908,15 +908,6 @@ but whether that is worth the trouble is another question. See
 
 ## Types and Constants Per Class Instance (the Configurator Pattern)
 
-> **Update** The below pattern, while viable, does have the disadvantage that for the single purpose of
-> allowing for more stringent, optionally per-instance, optionally parametrizable type declarations, it
-> still sacrifices the valuable prototype slot of the target class; this may complicate things down the line
-> when one wants to extend a class from another more 'valuable' / important / operationally desirable
-> prototype.
->
-> For these reasons, an alternative implementation in the form of a single function has been implemented as
-> [`guy.cfg.configure_with_types()`](https://github.com/loveencounterflow/guy/blob/master/src/cfg.coffee).
-
 See [`guy.cfg`](https://github.com/loveencounterflow/guy) for documentation; the implementation of
 `guy.cfg.configure_with_types()` is, roughly:
 
@@ -976,6 +967,16 @@ log ex.constructor.C?.defaults  # { constructor_cfg: { foo: 'foo-default', bar: 
 
 
 ### Deprecated Class Based Solution
+
+> **Update** The below pattern, while viable, does have the disadvantage that for the single purpose of
+> allowing for more stringent, optionally per-instance, optionally parametrizable type declarations, it
+> still sacrifices the valuable prototype slot of the target class; this may complicate things down the line
+> when one wants to extend a class from another more 'valuable' / important / operationally desirable
+> prototype.
+>
+> For these reasons, an alternative implementation in the form of a single function has been implemented as
+> [`guy.cfg.configure_with_types()`](https://github.com/loveencounterflow/guy/blob/master/src/cfg.coffee),
+> for which see the preceding section.
 
 This is a pattern to construct classes such that
 
