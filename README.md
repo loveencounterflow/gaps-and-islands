@@ -929,9 +929,10 @@ See [`guy.cfg`](https://github.com/loveencounterflow/guy) for documentation; the
   return undefined
 ```
 
-This short method does everything the below solution does, but in a more flexible way. You can now set up a
-class with class-level constants (including defaults) and a type declaration method; you call
-`configure_with_types()` from the `constructor()` method to get a frozen `@cfg` and access to `@types`:
+This short method does everything the class-based solution in the following section does, but in a more
+flexible way. You can now set up a class with class-level constants (including defaults) and a type
+declaration method; you call `configure_with_types()` from the `constructor()` method to get a frozen `@cfg`
+and access to `@types`:
 
 ```coffee
 class Ex
