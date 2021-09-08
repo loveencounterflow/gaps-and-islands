@@ -32,7 +32,8 @@ This part to be updated by running `doctoc REDME.md`
   - [CSS Variables with User Settings, Defaults](#css-variables-with-user-settings-defaults)
 - [CoffeeScript](#coffeescript)
   - [Properties with Getters and Setters for (ES6) Classes](#properties-with-getters-and-setters-for-es6-classes)
-  - [Types and Constants Per Class Instance](#types-and-constants-per-class-instance)
+  - [Types and Constants Per Class Instance (the Configurator Pattern)](#types-and-constants-per-class-instance-the-configurator-pattern)
+    - [Deprecated Class Based Solution](#deprecated-class-based-solution)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -905,8 +906,76 @@ but whether that is worth the trouble is another question. See
 
 
 
-## Types and Constants Per Class Instance
+## Types and Constants Per Class Instance (the Configurator Pattern)
 
+> **Update** The below pattern, while viable, does have the disadvantage that for the single purpose of
+> allowing for more stringent, optionally per-instance, optionally parametrizable type declarations, it
+> still sacrifices the valuable prototype slot of the target class; this may complicate things down the line
+> when one wants to extend a class from another more 'valuable' / important / operationally desirable
+> prototype.
+>
+> For these reasons, an alternative implementation in the form of a single function has been implemented as
+> [`guy.cfg.configure_with_types()`](https://github.com/loveencounterflow/guy/blob/master/src/cfg.coffee).
+
+See [`guy.cfg`](https://github.com/loveencounterflow/guy) for documentation; the implementation of
+`guy.cfg.configure_with_types()` is, roughly:
+
+```coffee
+@configure_with_types = ( self, cfg = null, types = null ) =>
+  { props, }    = require '..'
+  clasz         = self.constructor
+  #.........................................................................................................
+  ### assign defaults object where to be found to obtain viable `cfg` object: ###
+  defaults      = clasz.C?.defaults?.constructor_cfg ? null
+  self.cfg      = freeze { defaults..., cfg..., }
+  #.........................................................................................................
+  ### procure `types` where not given; make it a non-enumerable to avoid rpr of object: ###
+  types        ?= new ( require 'intertype' ).Intertype()
+  props.def self, 'types', { enumerable: false, value: types, }
+  #.........................................................................................................
+  ### call class method `declare_types()`; this method may perform `self.types.validate.constructor_cfg self.cfg`: ###
+  clasz.declare_types self if clasz.declare_types?
+  return undefined
+```
+
+This short method does everything the below solution does, but in a more flexible way. You can now set up a
+class with class-level constants (including defaults) and a type declaration method; you call
+`configure_with_types()` from the `constructor()` method to get a frozen `@cfg` and access to `@types`:
+
+```coffee
+class Ex
+
+  @C: guy.lft.freeze
+    foo:      'foo-constant'
+    bar:      'bar-constant'
+    defaults:
+      constructor_cfg:
+        foo:      'foo-default'
+        bar:      'bar-default'
+
+  @declare_types: ( self ) ->
+    self.types.declare 'constructor_cfg', tests:
+      "@isa.object x":                    ( x ) -> @isa.object x
+      "x.foo in [ 'foo-default', 42, ]":  ( x ) -> x.foo in [ 'foo-default', 42, ]
+      "x.bar is 'bar-default'":           ( x ) -> x.bar is 'bar-default'
+    self.types.validate.constructor_cfg self.cfg
+    return null
+
+  constructor: ( cfg ) ->
+    guy.cfg.configure_with_types @, cfg
+    return undefined
+
+#.......................................................................................................
+ex = new Ex { foo: 42, }
+log ex                          # Ex { cfg: { foo: 42, bar: 'bar-default' } }
+log ex.cfg                      # { foo: 42, bar: 'bar-default' }
+log ex.constructor.C            # { foo: 'foo-constant', bar: 'bar-constant', defaults: { constructor_cfg: { foo: 'foo-default', bar: 'bar-default' } } }
+log ex.constructor.C?.defaults  # { constructor_cfg: { foo: 'foo-default', bar: 'bar-default' } }
+```
+
+
+
+### Deprecated Class Based Solution
 
 This is a pattern to construct classes such that
 
@@ -915,7 +984,6 @@ This is a pattern to construct classes such that
 * types are accessible through the / any instance
 * in theory, one could call the class method `create_types()` with any instance / object (provided that if
   it has a `cfg` property, it does validate)
-
 
 ```coffee
 'use strict'
