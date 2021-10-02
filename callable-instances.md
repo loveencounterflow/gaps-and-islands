@@ -6,7 +6,6 @@ it is possible to declare a class that extends `Function()`:
 
 ```coffee
 #===========================================================================================================
-### thx to https://stackoverflow.com/a/40878674/256361 ###
 class Fn extends Function
 
   #---------------------------------------------------------------------------------------------------------
@@ -64,4 +63,7 @@ Note that because we return `@_me` (instead of `undefined` or `@`) from the `Fn:
 instance attributes must be attached to `@_me` in the constructor, while the `this` value available from
 methods is this very `@_me`, and so attributes from that point of view *can* be accessed derictly through
 `this`/`@`.
+
+* originally thx to https://stackoverflow.com/a/40878674/256361
+* also see https://hackernoon.com/creating-callable-objects-in-javascript-d21l3te1
 
