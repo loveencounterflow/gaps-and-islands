@@ -138,6 +138,19 @@ From
 
 <insert src='./css.md'/>
 
+## Turn ES `import` into CommonJS `require`
+
+* https://git.cryto.net/joepie91/fix-esm.git
+* https://www.npmjs.com/package/fix-esm
+* https://gist.github.com/joepie91/bca2fda868c1e8b2c2caf76af7dfcad3
+
+```coffee
+require_import            = ( name ) ->   ( require 'fix-esm' ).require name
+require_import_default    = ( name ) -> ( ( require 'fix-esm' ).require name ).default
+path_as_url               = require_import_default 'file-url'
+console.log path_as_url './foo/bar'
+```
+
 
 # CoffeeScript
 
