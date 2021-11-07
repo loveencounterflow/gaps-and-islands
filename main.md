@@ -135,9 +135,6 @@ From
 <insert src='./turning-asynchronous-functions-into-synchronous-ones.md'/>
 <insert src='./context-managers.md'/>
 
-
-<insert src='./css.md'/>
-
 ## Turn ES `import` into CommonJS `require`
 
 * https://git.cryto.net/joepie91/fix-esm.git
@@ -150,6 +147,9 @@ require_import_default    = ( name ) -> ( ( require 'fix-esm' ).require name ).d
 path_as_url               = require_import_default 'file-url'
 console.log path_as_url './foo/bar'
 ```
+
+<insert src='./css.md'/>
+
 
 
 # CoffeeScript

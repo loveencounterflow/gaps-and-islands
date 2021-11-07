@@ -28,9 +28,9 @@ This part to be updated by running `doctoc REDME.md`
   - [Event Emitter as Async Generator](#event-emitter-as-async-generator)
   - [Turning Asynchronous functions into Synchronous ones](#turning-asynchronous-functions-into-synchronous-ones)
   - [Context Managers](#context-managers)
+  - [Turn ES `import` into CommonJS `require`](#turn-es-import-into-commonjs-require)
 - [CSS](#css)
   - [CSS Variables with User Settings, Defaults](#css-variables-with-user-settings-defaults)
-  - [Turn ES `import` into CommonJS `require`](#turn-es-import-into-commonjs-require)
 - [CoffeeScript](#coffeescript)
   - [Properties with Getters and Setters for (ES6) Classes](#properties-with-getters-and-setters-for-es6-classes)
   - [Types and Constants Per Class Instance (the Configurator Pattern)](#types-and-constants-per-class-instance-the-configurator-pattern)
@@ -802,6 +802,18 @@ dba.with_foreign_keys_off ->
 
 
 
+## Turn ES `import` into CommonJS `require`
+
+* https://git.cryto.net/joepie91/fix-esm.git
+* https://www.npmjs.com/package/fix-esm
+* https://gist.github.com/joepie91/bca2fda868c1e8b2c2caf76af7dfcad3
+
+```coffee
+require_import            = ( name ) ->   ( require 'fix-esm' ).require name
+require_import_default    = ( name ) -> ( ( require 'fix-esm' ).require name ).default
+path_as_url               = require_import_default 'file-url'
+console.log path_as_url './foo/bar'
+```
 
 # CSS
 
@@ -886,18 +898,6 @@ to search all the spots in our styles where user-configurable variables are used
 
 
 
-## Turn ES `import` into CommonJS `require`
-
-* https://git.cryto.net/joepie91/fix-esm.git
-* https://www.npmjs.com/package/fix-esm
-* https://gist.github.com/joepie91/bca2fda868c1e8b2c2caf76af7dfcad3
-
-```coffee
-require_import            = ( name ) ->   ( require 'fix-esm' ).require name
-require_import_default    = ( name ) -> ( ( require 'fix-esm' ).require name ).default
-path_as_url               = require_import_default 'file-url'
-console.log path_as_url './foo/bar'
-```
 
 
 # CoffeeScript
