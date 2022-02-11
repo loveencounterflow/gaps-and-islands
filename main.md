@@ -66,6 +66,55 @@ select FM._array_regex_position( array[ 'foo', 'bar', 'baz' ], 'az' );  -- gives
 
 <insert src='./immutable-columns-in-sql.md'/>
 
+## Using `lateral` Replacement in SQLite
+
+Given this toy table with a few numbers:
+
+```sql
+create table a ( d int );
+insert into a values ( 1 ), ( 2 ), ( 3 ), ( 5 ), ( 7 ), ( 11 );
+```
+
+we want to get a table with these numbers to gether with their square roots and their
+square roots multiplied by two. The naive approach is to repeat the common part in both
+columns:
+
+```sql
+select
+    d               as d,
+    sqrt( d )       as e,
+    sqrt( d ) * 2   as f
+  from a;
+```
+
+This solution is the more unsatisfying the more expensive the function call gets and the
+more often we wish to re-use its result in our view. In Postgres, the better solution
+is to use `lateral` function calls. `lateral` clauses can be appended to the list of
+references in the `from` clause, like this:
+
+```sql
+select
+    a.d             as d,
+    r.e             as e,
+    r.e * 2         as f
+  from a,
+  lateral sqrt( d ) as r ( e );
+```
+
+Especially when expressions get longer, putting them into the `from` part of the
+statement also helps legibility somewhat.
+
+Unfortunately, `lateral` is not part of SQLite's version of SQL (as of early 2022), so we
+need to look for another solution. Turns out a `join` can be used as replacement:
+
+```sql
+select
+    a.d             as d,
+    r.e             as e,
+    r.e * 2         as f
+  from a
+  join ( select d, sqrt( d ) as e from a ) as r using ( d );
+```
 
 # Linux Shell / Bash
 
