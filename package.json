@@ -13,9 +13,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "cnd": "^9.2.1",
-    "intertext-splitlines": "^1.1.0",
-    "mixa": "^0.1.1",
-    "paragate": "^1.2.1"
+    "guy": "^10.0.0",
+    "mixa": "0.6.1",
+    "paragate": "4.0.0"
   }
 }
