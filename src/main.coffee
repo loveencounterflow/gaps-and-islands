@@ -2,24 +2,21 @@
 'use strict'
 
 ############################################################################################################
-CND                       = require 'cnd'
-badge                     = 'GAPS-AND-ISLANDS'
-rpr                       = CND.rpr
-log                       = CND.get_logger 'plain',     badge
-info                      = CND.get_logger 'info',      badge
-whisper                   = CND.get_logger 'whisper',   badge
-alert                     = CND.get_logger 'alert',     badge
-debug                     = CND.get_logger 'debug',     badge
-warn                      = CND.get_logger 'warn',      badge
-help                      = CND.get_logger 'help',      badge
-urge                      = CND.get_logger 'urge',      badge
-_echo                     = CND.echo.bind CND
-echo                      = ( text ) -> _echo text.replace /\n$/, ''
+GUY                       = require 'guy'
+{ alert
+  debug
+  help
+  info
+  plain
+  praise
+  urge
+  warn
+  whisper }               = GUY.trm.get_loggers 'GAPS-AND-ISLANDS'
+{ rpr
+  inspect
+  echo
+  log     }               = GUY.trm
 #...........................................................................................................
-{ assign
-  jr }                    = CND
-# types                     = require '../../../apps/paragate/lib/types'
-# { isa }                   = types
 PATH                      = require 'path'
 FSP                       = ( require 'fs' ).promises
 PGT                       = require 'paragate'
