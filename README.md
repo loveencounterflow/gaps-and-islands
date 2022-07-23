@@ -36,6 +36,7 @@ This part to be updated by running `doctoc REDME.md`
   - [Properties with Getters and Setters for (ES6) Classes](#properties-with-getters-and-setters-for-es6-classes)
   - [Types and Constants Per Class Instance (the Configurator Pattern)](#types-and-constants-per-class-instance-the-configurator-pattern)
     - [Deprecated Class Based Solution](#deprecated-class-based-solution)
+  - [Programmatic Functions with Correct Names](#programmatic-functions-with-correct-names)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1152,6 +1153,12 @@ C           = _Hollerith_proto.C
 ### Export all-uppercase (== stateless) instance with default `cfg` for wash-n-go usage: ###
 @HOLLERITH  = new @Hollerith()
 ```
+
+
+
+
+## Programmatic Functions with Correct Names
+
 
 
 
