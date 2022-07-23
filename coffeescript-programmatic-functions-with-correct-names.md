@@ -28,8 +28,8 @@ log add_beauty_2                  # [Function: beautified]                    �
 ```
 
 * When one then prints that returned function to the console, the output will just say `[Function
-  (anonymous)]` which tells you pretty much nothing; it's worse in error messages: 'The error occurred in
-  any of your many anonymous functions'.
+  (anonymous)]` which tells you pretty much nothing; it's worse in error messages: *The error occurred in
+    any of your many anonymous functions*.
 
 * One can in a one-liner fashion prepend the function with an assignment to a throw-away local variable.
   Modern JS engines have for a decade or so now learned to pick up that name and tack it unto the function.
@@ -43,16 +43,16 @@ log add_beauty_2                  # [Function: beautified]                    �
   the simple reason that we need an identifier on the LHS of the assignment. Needless to say, such a
   solution would be overkill, brittle and probably also create some kind of attack surface.
 
-* Fortunately, there's a pretty straightforward way. Watrch this:
+* Fortunately, there's a pretty straightforward way to **create functions with custom names**. Watch this:
 
 ```coffee
-log { x: 42, }                    # { x: 42 }
-log { f: ( -> ), }                # { f: [Function: f] }                      — ❢ function picks up name `f`
+log { x: 42, }                # { x: 42 }
+log { f: ( -> ), }            # { f: [Function: f] }     — ❢ function picks up name `f`
 
-my_name = 'spiderman'
+my_name = 'wow'
 
-log { "#{my_name}": 42, }         # # { spiderman: 42 }                       — ❢❢ can use computed keys
-log { "#{my_name}": ( -> ), }     # # { spiderman: [Function: spiderman] }    — ❢❢❢ function picks up computed name
+log { "#{my_name}": 42, }     # { wow: 42 }              — ❢❢ can use computed keys
+log { "#{my_name}": ( -> ), } # { wow: [Function: wow] } — ❢❢❢ function picks up computed name
 ```
 
 
