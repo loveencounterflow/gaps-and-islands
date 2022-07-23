@@ -36,7 +36,7 @@ This part to be updated by running `doctoc REDME.md`
   - [Properties with Getters and Setters for (ES6) Classes](#properties-with-getters-and-setters-for-es6-classes)
   - [Types and Constants Per Class Instance (the Configurator Pattern)](#types-and-constants-per-class-instance-the-configurator-pattern)
     - [Deprecated Class Based Solution](#deprecated-class-based-solution)
-  - [Programmatic Functions with Correct Names](#programmatic-functions-with-correct-names)
+  - [Programmatic Functions with Computed Names (the ƒPOD pattern)](#programmatic-functions-with-computed-names-the-%C6%92pod-pattern)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1157,7 +1157,7 @@ C           = _Hollerith_proto.C
 
 
 
-## Programmatic Functions with Correct Names
+## Programmatic Functions with Computed Names (the ƒPOD pattern)
 
 
 * Problem: sometimes one wants to produce functions in a programmatic way. Often, one then returns an
@@ -1240,7 +1240,19 @@ log add_beauty_4              # 💚💚💚 [Function: beautified_add]         
   internal reference. Most of the time one will probably want something more practical; for example we could
   have computed the name of the returned function as shown in `get_beautified_calculator_4()`.
 
+* For the JS-only folks who have reached this point, here's what the same looks like in JavaScript:
 
+```js
+get_beautified_calculator_4 = function(f) {
+  var name;
+  name = `beautified_${f.name}`;
+  return {
+    [`${name}`]: function(a, b) {
+      return '⁂' + (f(a, b)).toString() + '⁂'; }
+  }[name]; };
+```
+
+* call it the ƒPOD pattern ('eff-pod'; ƒ for *function*, POD for *plain old dictionary*)
 
 
 

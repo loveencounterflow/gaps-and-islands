@@ -1,5 +1,5 @@
 
-## Programmatic Functions with Correct Names
+## Programmatic Functions with Computed Names (the ƒPOD pattern)
 
 
 * Problem: sometimes one wants to produce functions in a programmatic way. Often, one then returns an
@@ -82,6 +82,18 @@ log add_beauty_4              # 💚💚💚 [Function: beautified_add]         
   internal reference. Most of the time one will probably want something more practical; for example we could
   have computed the name of the returned function as shown in `get_beautified_calculator_4()`.
 
+* For the JS-only folks who have reached this point, here's what the same looks like in JavaScript:
 
+```js
+get_beautified_calculator_4 = function(f) {
+  var name;
+  name = `beautified_${f.name}`;
+  return {
+    [`${name}`]: function(a, b) {
+      return '⁂' + (f(a, b)).toString() + '⁂'; }
+  }[name]; };
+```
+
+* call it the ƒPOD pattern ('eff-pod'; ƒ for *function*, POD for *plain old dictionary*)
 
 
