@@ -23,15 +23,33 @@ log add_beauty_2                  # [Function: beautified]                    �
 
 #-----------------------------------------------------------------------------------------------------------
 
-log { x: 42, }                    # { x: 42 }
-log { f: ( -> ), }                # { f: [Function: f] }                      — ❢ function picks up name `f`
+log { x: 42, }                # { x: 42 }
+log { f: ( -> ), }            # { f: [Function: f] }     — ❢ function picks up name `f`
 
-my_name = 'spiderman'
+my_name = 'wow'
 
-log { "#{my_name}": 42, }         # # { spiderman: 42 }                       — ❢❢ can use computed keys
-log { "#{my_name}": ( -> ), }     # # { spiderman: [Function: spiderman] }    — ❢❢❢ function picks up computed name
+log { "#{my_name}": 42, }     # { wow: 42 }              — ❢❢ can use computed keys
+log { "#{my_name}": ( -> ), } # { wow: [Function: wow] } — ❢❢❢ function picks up computed name
 
+#-----------------------------------------------------------------------------------------------------------
 
+get_beautified_calculator_3 = ( name, f ) ->
+  return { "#{name}": ( a, b ) ->
+    return '⁂' + ( f a, b ).toString() + '⁂'
+  }[ name ]
+
+get_beautified_calculator_4 = ( f ) ->
+  name = "beautified_#{f.name}"
+  return { "#{name}": ( a, b ) ->
+    return '⁂' + ( f a, b ).toString() + '⁂'
+  }[ name ]
+
+add = ( a, b ) -> a + b
+
+add_beauty_3 = get_beautified_calculator_3 'a beautified add function', add
+add_beauty_4 = get_beautified_calculator_4 add
+log add_beauty_3              # 💚💚💚 [Function: a beautified add function] 💚💚💚
+log add_beauty_4              # 💚💚💚 [Function: beautified_add]            💚💚💚
 
 
 
