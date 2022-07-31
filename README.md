@@ -1159,7 +1159,7 @@ C           = _Hollerith_proto.C
 
 ## Programmatic Functions with Computed Names (the ƒPOD pattern)
 
-> **Update** Always read the docs first! As pointed out by [the fine
+> **Note** Always read the docs first! As pointed out by [the fine
 > Manual](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name),
 > "[t]he `name` property (of functions) is read-only and cannot be changed by the assignment operator [; t]o
 > change it, use
@@ -1178,9 +1178,9 @@ C           = _Hollerith_proto.C
 > Object.defineProperty f, 'name', { value: 'super name!!!', }    # [Function: super name!!!]
 > ```
 >
-> The solution outlined below is less flexible and syntactically less parsimonious, but maybe still
+> **The solution outlined below is less flexible and syntactically less parsimonious, but maybe still
 > interesting to see that JavaScript engines these days do consider computed keys when inferring a
-> functions's name. Other than that, you'll probably want to use the simpler solution shown above.
+> functions's name. Other than that, you'll probably want to use the simpler solution shown above.**
 
 
 * Problem: sometimes one wants to produce functions in a programmatic way. Often, one then returns an
