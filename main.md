@@ -116,6 +116,19 @@ select
   join ( select d, sqrt( d ) as e from a ) as r using ( d );
 ```
 
+## SQLite DB with All Function Names
+
+```bash
+$ sqlite3 /tmp/sqlite-with-fiunctions-list.sqlite "create view f as select * from pragma_function_list order by name;"
+$ sqlite3 /tmp/sqlite-with-fiunctions-list.sqlite "select * from f;"
+$ sqlite3 /tmp/sqlite-with-fiunctions-list.sqlite "select count(*) from f;" # (A)
+$ sqlitebrowser ~/temp/sqlite-with-fiunctions-list.sqlite                   # (B)
+```
+
+(1) gives me 198 functions, but open the same DB in [`sqlitebrowser`](https://sqlitebrowser.org), and their
+SQLite client library has only 119 functions.
+
+
 # Linux Shell / Bash
 
 ## `find` patterns
