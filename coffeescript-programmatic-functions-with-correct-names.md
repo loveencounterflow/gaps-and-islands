@@ -1,6 +1,26 @@
 
 ## Programmatic Functions with Computed Names (the ƒPOD pattern)
 
+**Update** Always read the docs first! As pointed out by [the fine
+Manual](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name),
+"[t]he `name` property (of functions) is read-only and cannot be changed by the assignment operator [; t]o
+change it, use
+[`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty)."
+Ergo:
+
+```coffee
+# create function in any way; name is inferred from lexical situation:
+f   = ( x ) -> x ** 2                                           # [Function: f]
+
+# optionally, bind it to an object; observe changed name in bound copy:
+ref = {}
+f   = f.bind ref                                                # [Function: bound f]
+
+# set name explicitly:
+Object.defineProperty f, 'name', { value: 'super name!!!', }    # [Function: super name!!!]
+```
+
+
 
 * Problem: sometimes one wants to produce functions in a programmatic way. Often, one then returns an
   anonymous function. Silly example in `get_beautified_calculator_1()`:
