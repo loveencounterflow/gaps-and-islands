@@ -220,9 +220,25 @@ console.log path_as_url './foo/bar'
 <insert src='./coffeescript-types-and-constants-per-class-instance.md'/>
 <insert src='./coffeescript-programmatic-functions-with-correct-names.md'/>
 
+## 'Private' / Hidden Class Fields in CoffeeScript
 
+> **NOTE** To Be Written
 
+```coffee
+class SomeClass
+  # this line is identical to `publicMethod: ->`
+  this::publicMethod = -> '*' + privateMethod() + '*'
+  privateProperty = 'foo'
+  privateMethod = -> privateProperty
 
+x = new SomeClass()
+for key from GUY.props.walk_keys x, { hidden: true, symbols: true, builtins: true, }
+debug '^342-1^', key
+info '^343-2^', x.publicMethod()
+```
+
+* https://crimefighter.svbtle.com/using-private-methods-in-coffeescript
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields
 
 
 

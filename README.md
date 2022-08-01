@@ -38,6 +38,7 @@ This part to be updated by running `doctoc REDME.md`
   - [Types and Constants Per Class Instance (the Configurator Pattern)](#types-and-constants-per-class-instance-the-configurator-pattern)
     - [Deprecated Class Based Solution](#deprecated-class-based-solution)
   - [Programmatic Functions with Computed Names (the ƒPOD pattern)](#programmatic-functions-with-computed-names-the-%C6%92pod-pattern)
+  - ['Private' / Hidden Class Fields in CoffeeScript](#private--hidden-class-fields-in-coffeescript)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1294,9 +1295,25 @@ get_beautified_calculator_4 = function(f) {
 
 
 
+## 'Private' / Hidden Class Fields in CoffeeScript
 
+> **NOTE** To Be Written
 
+```coffee
+class SomeClass
+# this line is identical to `publicMethod: ->`
+this::publicMethod = -> '*' + privateMethod() + '*'
+privateProperty = 'foo'
+privateMethod = -> privateProperty
 
+x = new SomeClass()
+for key from GUY.props.walk_keys x, { hidden: true, symbols: true, builtins: true, }
+debug '^342-1^', key
+info '^343-2^', x.publicMethod()
+```
+
+* https://crimefighter.svbtle.com/using-private-methods-in-coffeescript
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields
 
 
 
