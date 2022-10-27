@@ -190,6 +190,7 @@ From
 # NodeJS
 
 <insert src='./avoiding-accidental-string-substitutions.md'/>
+<insert src='./regex-unicode-custom-boundaries.md'/>
 <insert src='./mixins.md'/>
 <insert src='./callable-instances.md'/>
 <insert src='./reading-file-lines.md'/>

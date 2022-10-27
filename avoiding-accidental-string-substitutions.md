@@ -1,5 +1,5 @@
 
-## Avoiding Accidental String Substitutions (so-called A$$es)
+## Regular Expressions: How to Avoid Accidental String Substitutions (so-called A$$es)
 
 JavaScript's `String::replace()` function has that sometimes-useful feature that is replacement patterns in
 the replacement string; for example, when you do `'abc'.replace /(b)/g, '==$1=='`, you'll get `'a==b==c'`.
