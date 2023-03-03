@@ -10,9 +10,10 @@ accomplish in NodeJS.
 
 <del>There are two good solutions:</del>
 
-<del>
 
-#### Pipestreaming Solution
+#### <del>Pipestreaming Solution</del>
+
+<del>
 
 Using basic [PipeStreams](https://github.com/loveencounterflow/pipestreams), the more fully-featured
 [PipeDreams](https://github.com/loveencounterflow/pipedreams), or their successor (and WIP)
@@ -24,7 +25,11 @@ the lines of text become only available within stream transforms, it is not poss
 an iterator. ATM it is not quite clear to me whether building iterators on top of a pipestreaming
 solution is possible at all.
 
-#### Node-Readlines
+</del>
+
+#### <del>Node-Readlines</del>
+
+<del>
 
 Luckily there's the [n-readlines](https://github.com/nacholibre/node-readlines) package. From the blurb:
 
@@ -45,7 +50,11 @@ Usage is simple:
   return null
 ```
 
-#### A Better Solution: InterText SplitLines
+</del>
+
+#### <del>A Better Solution: InterText SplitLines</del>
+
+<del>
 
 A 'better', that is, as-fast-but-more-flexible solution is implemented in
 `src/read-undecoded-lines-from-stdin.coffee`. It uses `intertext-splitlines` to look for occurrences

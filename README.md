@@ -27,9 +27,9 @@ This part to be updated by running `doctoc REDME.md`
   - [Callable Instances](#callable-instances)
   - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
     - [The Old Way](#the-old-way)
-      - [Pipestreaming Solution](#pipestreaming-solution)
-      - [Node-Readlines](#node-readlines)
-      - [A Better Solution: InterText SplitLines](#a-better-solution-intertext-splitlines)
+      - [<del>Pipestreaming Solution</del>](#delpipestreaming-solutiondel)
+      - [<del>Node-Readlines</del>](#delnode-readlinesdel)
+      - [<del>A Better Solution: InterText SplitLines</del>](#dela-better-solution-intertext-splitlinesdel)
   - [Event Emitter as Async Generator](#event-emitter-as-async-generator)
   - [Turning Asynchronous functions into Synchronous ones](#turning-asynchronous-functions-into-synchronous-ones)
   - [Context Managers](#context-managers)
@@ -757,9 +757,10 @@ accomplish in NodeJS.
 
 <del>There are two good solutions:</del>
 
-<del>
 
-#### Pipestreaming Solution
+#### <del>Pipestreaming Solution</del>
+
+<del>
 
 Using basic [PipeStreams](https://github.com/loveencounterflow/pipestreams), the more fully-featured
 [PipeDreams](https://github.com/loveencounterflow/pipedreams), or their successor (and WIP)
@@ -771,7 +772,11 @@ the lines of text become only available within stream transforms, it is not poss
 an iterator. ATM it is not quite clear to me whether building iterators on top of a pipestreaming
 solution is possible at all.
 
-#### Node-Readlines
+</del>
+
+#### <del>Node-Readlines</del>
+
+<del>
 
 Luckily there's the [n-readlines](https://github.com/nacholibre/node-readlines) package. From the blurb:
 
@@ -792,7 +797,11 @@ Usage is simple:
   return null
 ```
 
-#### A Better Solution: InterText SplitLines
+</del>
+
+#### <del>A Better Solution: InterText SplitLines</del>
+
+<del>
 
 A 'better', that is, as-fast-but-more-flexible solution is implemented in
 `src/read-undecoded-lines-from-stdin.coffee`. It uses `intertext-splitlines` to look for occurrences
