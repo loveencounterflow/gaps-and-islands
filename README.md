@@ -749,7 +749,9 @@ methods is this very `@_me`, and so attributes from that point of view *can* be 
 ## Reading Text Files Line by Line
 
 Reading a text file in a linewise fashion is a basic task, yet surprisingly hard to
-accomplish in NodeJS. <del>There are two good solutions:
+accomplish in NodeJS. <del>There are two good solutions:</del>
+
+<del>
 
 ### Pipestreaming Solution
 
