@@ -3,7 +3,7 @@
 ## Reading Text Files Line by Line
 
 Reading a text file in a linewise fashion is a basic task, yet surprisingly hard to
-accomplish in NodeJS. There are two good solutions:
+accomplish in NodeJS. <del>There are two good solutions:
 
 ### Pipestreaming Solution
 
@@ -74,4 +74,4 @@ use_itxt_splitlines = -> new Promise ( resolve, reject ) =>
   return null
 ```
 
-
+</del>
