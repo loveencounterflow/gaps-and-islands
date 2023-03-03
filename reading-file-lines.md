@@ -3,11 +3,16 @@
 ## Reading Text Files Line by Line
 
 Reading a text file in a linewise fashion is a basic task, yet surprisingly hard to
-accomplish in NodeJS. <del>There are two good solutions:</del>
+accomplish in NodeJS.
+
+
+### The Old Way
+
+<del>There are two good solutions:</del>
 
 <del>
 
-### Pipestreaming Solution
+#### Pipestreaming Solution
 
 Using basic [PipeStreams](https://github.com/loveencounterflow/pipestreams), the more fully-featured
 [PipeDreams](https://github.com/loveencounterflow/pipedreams), or their successor (and WIP)
@@ -19,7 +24,7 @@ the lines of text become only available within stream transforms, it is not poss
 an iterator. ATM it is not quite clear to me whether building iterators on top of a pipestreaming
 solution is possible at all.
 
-### Node-Readlines
+#### Node-Readlines
 
 Luckily there's the [n-readlines](https://github.com/nacholibre/node-readlines) package. From the blurb:
 
@@ -40,7 +45,7 @@ Usage is simple:
   return null
 ```
 
-### A Better Solution: InterText SplitLines
+#### A Better Solution: InterText SplitLines
 
 A 'better', that is, as-fast-but-more-flexible solution is implemented in
 `src/read-undecoded-lines-from-stdin.coffee`. It uses `intertext-splitlines` to look for occurrences
