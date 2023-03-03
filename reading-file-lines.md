@@ -26,13 +26,18 @@ closer, there are some discrepancies with command line tools and e.g. Windows No
 this basic task is, in fact, not [universally](https://xkcd.com/927/)
 [standardized](https://www.explainxkcd.com/wiki/index.php/927:_Standards))
 
-
 <figure>
   <img src="artwork/standards_2x.png" alt="how standards proliferate">
-  <figcaption>Fortunately, the charging one has been solved now that we've all standardized on mini-USB. Or is it micro-USB? Shit.</figcaption>
+  <figcaption>*Fortunately, the charging one has been solved now that we've all standardized on mini-USB. Or is it micro-USB? Shit.*</figcaption>
 </figure>
 
+The objects `yield`ed by `fs.walk_lines_with_positions()` include 1-based line numbers and the one or two
+characters that were recognized as line endings; it is possible to transparently trim trailing whitespace
+from lines. These properties make the `GUY.*.walk_lines*()` family of methods a quite appropriate foundation
+for tasks like lexing files, If I [may say so myself]().
 
+The below is an excerpt of the [original Guy documentation, *🛠 A Guy of Many Trades
+🛠*](https://github.com/loveencounterflow/guy#guyfswalk_lines-guystrwalk_lines-and-guyfswalk_buffers):
 
 ------------------------------------------------------------------------------------------------------------
 
@@ -41,8 +46,7 @@ this basic task is, in fact, not [universally](https://xkcd.com/927/)
 * **`GUY.fs.walk_lines = ( path, cfg ) ->`**—Given a `path`, return a *synchronous* iterator over file
   lines. This is the most hassle-free approach to synchronously obtain lines of text files in NodeJS that
   I'm aware of, yet. The optional `cfg` argument may be an object with a single property `decode`; when set
-  to `false`, `walk_lines()` will iterate over buffers instead of strings. Observe that currently the
-  newline character is always assumed to be `\n` (i.e. U+00a0).
+  to `false`, `walk_lines()` will iterate over buffers instead of strings.
 
   **Behavior regarding terminal newline characters**: The following invariant shall hold:
 
