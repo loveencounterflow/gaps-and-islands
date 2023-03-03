@@ -776,7 +776,7 @@ this basic task is, in fact, not [universally](https://xkcd.com/927/)
 
 
 <figure>
-  <img src="./raw/master/artwork/standards_2x.png" alt="how standards proliferate">
+  <img src="artwork/standards_2x.png" alt="how standards proliferate">
   <figcaption>Fortunately, the charging one has been solved now that we've all standardized on mini-USB. Or is it micro-USB? Shit.</figcaption>
 </figure>
 
