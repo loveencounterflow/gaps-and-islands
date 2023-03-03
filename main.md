@@ -197,6 +197,7 @@ From
 <insert src='./event-emitter-as-async-generator.md'/>
 <insert src='./turning-asynchronous-functions-into-synchronous-ones.md'/>
 <insert src='./context-managers.md'/>
+<insert src='./step-walk-run.md'/>
 
 ## Turn ES `import` into CommonJS `require`
 
