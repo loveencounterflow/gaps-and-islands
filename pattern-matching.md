@@ -22,5 +22,20 @@ return null
 
 The default branch could also be written as `when true then ...`, but that's less clear so make it `else`.
 
+### Pattern Matching with Pre-Computed Values
+
+When an expression should be matched against multiple values one can use a `do` closure:
+
+```coffee
+for a in [ 0 .. 12 ]
+  do ( b = a + 1 ) =>
+    switch true
+      when b is 0       then  debug '^989-1^', b, 'none'
+      when b is 1       then  debug '^989-1^', b, 'single'
+      when b is 2       then  debug '^989-2^', b, 'double'
+      when 3 < b < 10   then  debug '^989-3^', b, 'many'
+      else                    debug '^989-4^', b, 'lots'
+return null
+```
 
 
