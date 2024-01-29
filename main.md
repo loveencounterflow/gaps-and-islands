@@ -1,4 +1,5 @@
 
+
 # Gaps and Islands
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -221,6 +222,7 @@ console.log path_as_url './foo/bar'
 <insert src='./coffeescript-class-instance-properties.md'/>
 <insert src='./coffeescript-types-and-constants-per-class-instance.md'/>
 <insert src='./coffeescript-programmatic-functions-with-correct-names.md'/>
+<insert src='./pattern-matching.md'/>
 
 ## 'Private' / Hidden Class Fields in CoffeeScript
 
