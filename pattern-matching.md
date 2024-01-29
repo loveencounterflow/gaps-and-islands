@@ -1,6 +1,6 @@
 
 
-## Pattern Matching in Plain JavaScript
+## Pattern Matching in Plain JavaScript (but using CoffeeScript)
 
 A [2020 blog post entitled *Pattern Matching in JavaScript*](https://kyleshevlin.com/pattern-matching)
 showed a solution how to do sort-of kind-of [pattern
