@@ -47,6 +47,9 @@ This part to be updated by running `doctoc REDME.md`
   - [Pattern Matching in Plain JavaScript (but using CoffeeScript)](#pattern-matching-in-plain-javascript-but-using-coffeescript)
     - [Pattern Matching with Pre-Computed Values](#pattern-matching-with-pre-computed-values)
   - ['Private' / Hidden Class Fields in CoffeeScript](#private--hidden-class-fields-in-coffeescript)
+- [Regular Expressions](#regular-expressions)
+  - [Tools](#tools)
+  - [Matching Anything but not this sequences](#matching-anything-but-not-this-sequences)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1634,4 +1637,23 @@ info '^343-2^', x.publicMethod()
 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields
 
 
+# Regular Expressions
+
+## Tools
+
+## Matching Anything but not this sequences
+
+Using negated character classes is basic RegEx Know-How. But how to avoid entire sequences or complex
+patterns? Predictably, the solution lies in using a negative lookahead, butit turns out the way it's used is
+not intuitive. Following the proposal made in [this top-rated SO
+answer](https://stackoverflow.com/a/977294/7568091)), in order to match anything except, say, any `the`, `a` or `an` that precedes
+a word boundary `\b`, the pattern should be
+
+```reges
+  /^(?:(?!\b(?:the|an?)\b).)+/
+```
+
+That's a negative lookahead containing the pattern to be avoided, `(?! AVOID )`; this is nested in a
+non-capturing group `(?: ... )+` which may repeat one or more times; *behind* the negative lookahead there's
+the pattern to be matched positively, in this case `.` a dot for 'any character'.
 
