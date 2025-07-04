@@ -26,6 +26,8 @@ This part to be updated by running `doctoc REDME.md`
   - [Regular Expressions: How to Test For Unicode-Compliant Boundaries](#regular-expressions-how-to-test-for-unicode-compliant-boundaries)
   - [Mixins](#mixins)
   - [Callable Instances](#callable-instances)
+    - [Solution 1: Base Class on Function](#solution-1-base-class-on-function)
+    - [Solution 2: Set Prototype Explicitly](#solution-2-set-prototype-explicitly)
   - [Reading Text Files Line by Line](#reading-text-files-line-by-line)
     - [`GUY.fs.walk_lines()`, `GUY.str.walk_lines()` and `GUY.fs.walk_buffers()`](#guyfswalk_lines-guystrwalk_lines-and-guyfswalk_buffers)
     - [The Old Way](#the-old-way)
@@ -686,8 +688,11 @@ if module is require.main then do =>
 
 ## Callable Instances
 
-Sometimes it is desirable to create function-like, callable objects from a class declaration. In JavaScript,
-it is possible to declare a class that extends `Function()`:
+Sometimes it is desirable to create function-like, callable objects from a class declaration.
+
+### Solution 1: Base Class on Function
+
+In JavaScript, it is possible to declare a class that extends `Function()`:
 
 ```coffee
 #===========================================================================================================
@@ -752,6 +757,17 @@ methods is this very `@_me`, and so attributes from that point of view *can* be 
 * originally thx to https://stackoverflow.com/a/40878674/256361
 * also see https://hackernoon.com/creating-callable-objects-in-javascript-d21l3te1
 
+
+### Solution 2: Set Prototype Explicitly
+
+
+```coffee
+class Type
+
+  constructor: ( callable ) ->
+    Object.setPrototypeOf callable, @
+    return callable
+```
 
 
 
