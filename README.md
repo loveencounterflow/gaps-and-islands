@@ -4,7 +4,7 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-This part to be updated by running `doctoc REDME.md`
+This part to be updated by running `doctoc README.md`
 
 - [SQL](#sql)
   - [The Gaps-And-Islands Pattern](#the-gaps-and-islands-pattern)
@@ -50,8 +50,7 @@ This part to be updated by running `doctoc REDME.md`
     - [Pattern Matching with Pre-Computed Values](#pattern-matching-with-pre-computed-values)
   - ['Private' / Hidden Class Fields in CoffeeScript](#private--hidden-class-fields-in-coffeescript)
 - [Regular Expressions](#regular-expressions)
-  - [Tools](#tools)
-  - [Matching Anything but not this sequences](#matching-anything-but-not-this-sequences)
+  - [Matching Anything but not this sequence](#matching-anything-but-not-this-sequence)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1655,18 +1654,16 @@ info '^343-2^', x.publicMethod()
 
 # Regular Expressions
 
-## Tools
-
-## Matching Anything but not this sequences
+## Matching Anything but not this sequence
 
 Using negated character classes is basic RegEx Know-How. But how to avoid entire sequences or complex
 patterns? Predictably, the solution lies in using a negative lookahead, butit turns out the way it's used is
 not intuitive. Following the proposal made in [this top-rated SO
-answer](https://stackoverflow.com/a/977294/7568091)), in order to match anything except, say, any `the`, `a` or `an` that precedes
-a word boundary `\b`, the pattern should be
+answer](https://stackoverflow.com/a/977294/7568091)), in order to match anything except, say, any `the`, `a`
+or `an` that precedes a word boundary `\b`, the pattern should be
 
 ```reges
-  /^(?:(?!\b(?:the|an?)\b).)+/
+/^(?:(?!\b(?:the|an?)\b).)+/
 ```
 
 That's a negative lookahead containing the pattern to be avoided, `(?! AVOID )`; this is nested in a
