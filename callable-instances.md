@@ -1,8 +1,11 @@
 
 ## Callable Instances
 
-Sometimes it is desirable to create function-like, callable objects from a class declaration. In JavaScript,
-it is possible to declare a class that extends `Function()`:
+Sometimes it is desirable to create function-like, callable objects from a class declaration.
+
+### Solution 1: Base Class on Function
+
+In JavaScript, it is possible to declare a class that extends `Function()`:
 
 ```coffee
 #===========================================================================================================
@@ -67,3 +70,14 @@ methods is this very `@_me`, and so attributes from that point of view *can* be 
 * originally thx to https://stackoverflow.com/a/40878674/256361
 * also see https://hackernoon.com/creating-callable-objects-in-javascript-d21l3te1
 
+
+### Solution 2: Set Prototype Explicitly
+
+
+```coffee
+class Type
+
+  constructor: ( callable ) ->
+    Object.setPrototypeOf callable, @
+    return callable
+```
