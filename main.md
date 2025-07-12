@@ -193,7 +193,6 @@ From
 <insert src='./avoiding-accidental-string-substitutions.md'/>
 <insert src='./regex-unicode-custom-boundaries.md'/>
 <insert src='./mixins.md'/>
-<insert src='./callable-instances.md'/>
 <insert src='./reading-file-lines.md'/>
 <insert src='./event-emitter-as-async-generator.md'/>
 <insert src='./turning-asynchronous-functions-into-synchronous-ones.md'/>
@@ -220,6 +219,7 @@ console.log path_as_url './foo/bar'
 # CoffeeScript
 
 <insert src='./coffeescript-class-instance-properties.md'/>
+<insert src='./coffeescript-callable-instances.md'/>
 <insert src='./coffeescript-types-and-constants-per-class-instance.md'/>
 <insert src='./coffeescript-programmatic-functions-with-correct-names.md'/>
 <insert src='./pattern-matching.md'/>
