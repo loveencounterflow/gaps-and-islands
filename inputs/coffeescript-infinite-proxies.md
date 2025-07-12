@@ -2,6 +2,33 @@
 
 ## Infinite Proxies
 
+* A **proxy**, of course, is a device to capture / manage / deflect / instrument access to a specific, some
+  or all properties of a given object;
+
+* an **infinite proxy** (or, more precisely, an **infinite-chain proxy**) is a proxy that allows building
+  arbitrarily deep 'as hoc' chains of properties on a managed object.
+
+* Below we show a partial implementation for a proxy inspired by
+  [`webdiscus/ansis`](https://github.com/webdiscus/ansis), a CLI color library that enables users to write,
+  say, `console.log ansis.bold.underline.red "warning"`; here, `ansis` would be our proxied `base` object (a
+  function), and `.bold.underline.red()` is a chain of properties that describe the desired style of output
+  to apply to the text which forms the argument of the call.
+
+* `webdiscus/ansis` also enables stuff like `ansis.underlin.hex('#5afb33').underline"text"` which we will
+  not discuss here.
+
+* The proxy as shown below uses a variable `stack` to record all property accesses on the proxy;
+
+* it returns (essentially) itself (i.e. property access on this proxy returns the same proxy).
+
+* Since the 'target' (viewpoint of the proxy) respectively the 'base' (viewpoint of the user) is a function,
+  the property chain can be ended at any point and arguments can be added, so `p.bold.red 'x'` accesses
+  `bold` (stack is `[ 'bold', ]`), then `red` (stack is `[ 'bold', 'red', ]`), and finally calls the base
+  with argument `'x'`.
+
+* The base will pop all names from the stack, decide (in the real world) what ANSI codes to use to implement
+  the desired styles, or else (in this demo) just report the stacked names in the output.
+
 ```coffee
 #===========================================================================================================
 demo_proxy = ->
@@ -76,4 +103,17 @@ demo_proxy = ->
     return null
   return null
 ```
+
+---------------------------------
+
+
+> **Note** OT but the example uses `nfa { template, }, ( base, is_initial, cfg ) ->` to declare the
+> signature of `new_infiniproxy()`; 'NFA' stands for **N**ormalize **F**unction **A**rguments and is
+> available (also on NPM) as
+> [`loveencounterflow/normalize-function-arguments`](https://github.com/loveencounterflow/normalize-function-arguments);
+> the effect of `fn = nfa { template, } ( a, b, cfg ) ->` is that `fn()` can now be called as `fn x1`, `fn
+> x1, x2` or `fn x1, x2, { x3: 'other value', y: ..., z: ..., }` and `nfa` will take care that the
+> positional arguments and the named values in the `cfg` object will always be consistent (`x1 === cfg.x1`
+> and so on), among other things.
+
 
