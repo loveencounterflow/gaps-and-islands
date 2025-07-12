@@ -6,7 +6,7 @@
   or all properties of a given object;
 
 * an **infinite proxy** (or, more precisely, an **infinite-chain proxy**) is a proxy that allows building
-  arbitrarily deep 'as hoc' chains of properties on a managed object.
+  arbitrarily deep 'ad hoc' chains of properties on a managed object.
 
 * Below we show a partial implementation for a proxy inspired by
   [`webdiscus/ansis`](https://github.com/webdiscus/ansis), a CLI color library that enables users to write,
@@ -17,17 +17,22 @@
 * `webdiscus/ansis` also enables stuff like `ansis.underlin.hex('#5afb33').underline"text"` which we will
   not discuss here.
 
-* The proxy as shown below uses a variable `stack` to record all property accesses on the proxy;
+* The proxy as shown below uses a state variable `stack` to record all property accesses on the proxy.
 
-* it returns (essentially) itself (i.e. property access on this proxy returns the same proxy).
+* The proxy returns (essentially) itself (i.e. property access on this proxy returns the same proxy).
 
-* Since the 'target' (viewpoint of the proxy) respectively the 'base' (viewpoint of the user) is a function,
-  the property chain can be ended at any point and arguments can be added, so `p.bold.red 'x'` accesses
-  `bold` (stack is `[ 'bold', ]`), then `red` (stack is `[ 'bold', 'red', ]`), and finally calls the base
-  with argument `'x'`.
+* Since the 'target' (viewpoint of the proxy)—respectively, the 'base' (viewpoint of the user)—is a
+  function, the property chain can be ended at any point and arguments to a function call can be added, so
+  `p.bold.red 'x'` accesses `bold` (stack is `[ 'bold', ]`), then `red` (stack is `[ 'bold', 'red', ]`), and
+  finally calls the base with argument `'x'`.
 
-* The base will pop all names from the stack, decide (in the real world) what ANSI codes to use to implement
-  the desired styles, or else (in this demo) just report the stacked names in the output.
+* The base function is to be provided by the user according to intended purposes; it can handle the stack
+  as seen fit. A more complete implementation would probably provide the stack as additional argument or
+  make it accessible by similar means.
+
+* The base shown in this demo will pop all names from the stack; in a real world application it could then
+  interpolate ANSI codes to implement the desired styles. In the demo, we just report the stacked names in
+  the output.
 
 ```coffee
 #===========================================================================================================
