@@ -18,7 +18,7 @@ This part to be updated by running `doctoc README.md`
 
 ```sql
 
-<insert src='./gaps-and-islands.icql'/>
+<insert src='./inputs/gaps-and-islands.icql'/>
 
 ```
 
@@ -65,7 +65,7 @@ select FM._array_regex_position( array[ 'foo', 'bar', 'baz' ], 'X'  );  -- gives
 select FM._array_regex_position( array[ 'foo', 'bar', 'baz' ], 'az' );  -- gives 3
 ```
 
-<insert src='./immutable-columns-in-sql.md'/>
+<insert src='./inputs/immutable-columns-in-sql.md'/>
 
 ## Using `lateral` Replacement in SQLite
 
@@ -190,14 +190,14 @@ From
 
 # NodeJS
 
-<insert src='./avoiding-accidental-string-substitutions.md'/>
-<insert src='./regex-unicode-custom-boundaries.md'/>
-<insert src='./mixins.md'/>
-<insert src='./reading-file-lines.md'/>
-<insert src='./event-emitter-as-async-generator.md'/>
-<insert src='./turning-asynchronous-functions-into-synchronous-ones.md'/>
-<insert src='./context-managers.md'/>
-<insert src='./step-walk-run.md'/>
+<insert src='./inputs/avoiding-accidental-string-substitutions.md'/>
+<insert src='./inputs/regex-unicode-custom-boundaries.md'/>
+<insert src='./inputs/mixins.md'/>
+<insert src='./inputs/reading-file-lines.md'/>
+<insert src='./inputs/event-emitter-as-async-generator.md'/>
+<insert src='./inputs/turning-asynchronous-functions-into-synchronous-ones.md'/>
+<insert src='./inputs/context-managers.md'/>
+<insert src='./inputs/step-walk-run.md'/>
 
 ## Turn ES `import` into CommonJS `require`
 
@@ -212,17 +212,17 @@ path_as_url               = require_import_default 'file-url'
 console.log path_as_url './foo/bar'
 ```
 
-<insert src='./css.md'/>
+<insert src='./inputs/css.md'/>
 
 
 
 # CoffeeScript
 
-<insert src='./coffeescript-class-instance-properties.md'/>
-<insert src='./coffeescript-callable-instances.md'/>
-<insert src='./coffeescript-types-and-constants-per-class-instance.md'/>
-<insert src='./coffeescript-programmatic-functions-with-correct-names.md'/>
-<insert src='./coffeescript-pattern-matching.md'/>
+<insert src='./inputs/coffeescript-class-instance-properties.md'/>
+<insert src='./inputs/coffeescript-callable-instances.md'/>
+<insert src='./inputs/coffeescript-types-and-constants-per-class-instance.md'/>
+<insert src='./inputs/coffeescript-programmatic-functions-with-correct-names.md'/>
+<insert src='./inputs/coffeescript-pattern-matching.md'/>
 
 ## 'Private' / Hidden Class Fields in CoffeeScript
 
