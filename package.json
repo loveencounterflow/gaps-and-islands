@@ -14,7 +14,6 @@
   "license": "MIT",
   "dependencies": {
     "guy": "^10.0.0",
-    "mixa": "0.6.1",
     "paragate": "4.0.0"
   }
 }
