@@ -220,6 +220,7 @@ console.log path_as_url './foo/bar'
 
 <insert src='./inputs/coffeescript-class-instance-properties.md'/>
 <insert src='./inputs/coffeescript-callable-instances.md'/>
+<insert src='./inputs/coffeescript-infinite-proxies.md'/>
 <insert src='./inputs/coffeescript-types-and-constants-per-class-instance.md'/>
 <insert src='./inputs/coffeescript-programmatic-functions-with-correct-names.md'/>
 <insert src='./inputs/coffeescript-pattern-matching.md'/>
