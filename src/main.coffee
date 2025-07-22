@@ -17,8 +17,8 @@ GUY                       = require 'guy'
   echo
   log     }               = GUY.trm
 #...........................................................................................................
-PATH                      = require 'path'
-FSP                       = ( require 'fs' ).promises
+PATH                      = require 'node:path'
+FSP                       = ( require 'node:fs' ).promises
 PGT                       = require 'paragate'
 join                      = ( me, P...  ) -> PATH.resolve PATH.join me.base_path, P...
 read                      = ( me, path  ) -> await FSP.readFile path, { encoding: 'utf-8', }
