@@ -49,6 +49,7 @@ This part to be updated by running `doctoc README.md`
   - [Pattern Matching in Plain JavaScript (but using CoffeeScript)](#pattern-matching-in-plain-javascript-but-using-coffeescript)
     - [Pattern Matching with Pre-Computed Values](#pattern-matching-with-pre-computed-values)
   - [Another Way to Build Mixins: Commutators](#another-way-to-build-mixins-commutators)
+  - [Mixing Named ('Qualified') and Positional Arguments](#mixing-named-qualified-and-positional-arguments)
   - ['Private' / Hidden Class Fields in CoffeeScript](#private--hidden-class-fields-in-coffeescript)
 - [Regular Expressions](#regular-expressions)
   - [Matching Anything but not this sequence](#matching-anything-but-not-this-sequence)
@@ -1681,6 +1682,59 @@ demo_commutator = ->
   return null
 ```
 
+
+## Mixing Named ('Qualified') and Positional Arguments
+
+```coffee
+#.........................................................................................................
+demo_named_and_positional = ->
+#.......................................................................................................
+f = ({ 0: x_, 1: base_, x, base, k..., }) ->
+# debug 'Ωbrbr_248', [ arguments..., ], { x, base, x_, base_, }
+x     = x_    unless x_     is undefined
+base  = base_ unless base_  is undefined
+debug 'Ωbrbr_249', { x, base, }
+return null
+#.......................................................................................................
+g = ({ Q..., }) ->
+# debug 'Ωbrbr_250', { Q, }
+x     = if Q.x    isnt undefined then Q.x     else Q[ 0 ]
+base  = if Q.base isnt undefined then Q.base  else Q[ 1 ]
+debug 'Ωbrbr_251', { x, base, }
+return null
+#.......................................................................................................
+h = ({ Q..., }) ->
+{ x,
+base, } = get_pq_arguments Q, 'x', 'base'
+debug 'Ωbrbr_252', { x, base, }
+return null
+#.......................................................................................................
+coalesce = ( x, names... ) ->
+for name in names
+return R if ( R = x[ name ] ) isnt undefined
+return undefined
+#.......................................................................................................
+get_pq_arguments = ( Q, names... ) -> Object.fromEntries \
+( [ name, ( coalesce Q, name, idx ), ] for name, idx in names )
+#.......................................................................................................
+f [ 5, 16, ]
+f { x: 5, base: 16, }
+f { x: 5, base: 16, arc: 16, bo: 11, }
+echo 'Ωbrbr_253 ———————————'
+g [ 5, 16, ]
+g { x: 5, base: 16, }
+g { x: 5, base: 16, arc: 16, bo: 11, }
+echo 'Ωbrbr_254 ———————————'
+h [ 5, 16, ]
+h { x: 5, base: 16, }
+h { x: 5, base: 16, arc: 16, bo: 11, }
+echo 'Ωbrbr_254 ———————————'
+h [ 5, ]
+h { x: 5, }
+h { x: 5, arc: 16, bo: 11, }
+return null
+demo_named_and_positional()
+```
 
 ## 'Private' / Hidden Class Fields in CoffeeScript
 
