@@ -129,6 +129,40 @@ $ sqlitebrowser ~/temp/sqlite-with-fiunctions-list.sqlite                   # (B
 (1) gives me 198 functions, but open the same DB in [`sqlitebrowser`](https://sqlitebrowser.org), and their
 SQLite client library has only 119 functions.
 
+## ESSFRI: Improving Integrity Checks in SQLite
+
+Whereas Postgres is very strict in almost all aspects, allows no forward references and complains when it
+encounters a view DDL that declares an unknown column, SQLite is more forgiving when it comes to `create
+view` statements. For example, in an empty SQLite DB you can declare the following view:
+
+```sql
+drop view if exists bb_kw;
+create view if not exists bb_kw as select
+    a,
+    b
+  from nosuchtable;
+```
+
+without getting any hint that the view depends on a non-existant relation `nosuchtable` with non-existant
+fields `a` and `b`. You *will* get an error, eventually, but only when you try to *use* the view, which may
+happen at any arbitrary point in the future, or never. To improve this situation, there's a simple
+workaround: use the view immediately! So instead of code like shown above, always add a `select` like so:
+
+```sql
+drop view if exists bb_kw;
+create view if not exists bb_kw as select
+    a,
+    b
+  from nosuchtable;
+select * from bb_kw where false;
+```
+
+This line will do nothing and produce no output when the view DDL is referentially sound, but it will cause
+the SQLite engine to compile a statement and complain with an error if any referenced relation or field is
+not known at this point in time, which brings SQLite's behavior a bit closer to the way it should have
+always been. Superficial tests have convinced me that tables are scrutinized more closely at creation time
+so for the time being the 'empty select statement for referential integrity' (ESSFRI) is only useful when
+applied to views.
 
 # Linux Shell / Bash
 
