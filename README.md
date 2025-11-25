@@ -16,6 +16,7 @@ This part to be updated by running `doctoc README.md`
   - [Using `lateral` Replacement in SQLite](#using-lateral-replacement-in-sqlite)
   - [SQLite DB with All Function Names](#sqlite-db-with-all-function-names)
   - [ESSFRI: Improving Integrity Checks in SQLite](#essfri-improving-integrity-checks-in-sqlite)
+  - [The Fastest Inserts in the Universe](#the-fastest-inserts-in-the-universe)
 - [Linux Shell / Bash](#linux-shell--bash)
   - [`find` patterns](#find-patterns)
 - [better `df`](#better-df)
@@ -438,6 +439,83 @@ not known at this point in time, which brings SQLite's behavior a bit closer to 
 always been. Superficial tests have convinced me that tables are scrutinized more closely at creation time
 so for the time being the 'empty select statement for referential integrity' (ESSFRI) is only useful when
 applied to views.
+
+## The Fastest Inserts in the Universe
+
+**The Dual-Statement + App Code Approach:** A common pattern to do insert rows in an SQLite application is
+to iterate over the rows of an SQL `select` statement, then process that data in JavaScript because maybe
+you need additional stuff from outside the database or it's just much easier to process the data in
+JavaScript than in SQL for the particular case, and then for every resulting row, you call a separate SQL
+`insert` staement to persist the data.
+
+One obvious problem with this approach is of course that it only works when `pragma journal_mode` has to be
+set to `WAL`, and even then, you need to open a second connection (in the same process, to the same DB) that
+does the writing.
+
+**The SQL-only Approach:** In one case I wanted to split some strings into their constituent parts to get
+the rows for another table; SQLite has no built-in table function for splitting strings, so you'd *think*
+you can do that with a recursive CTE, but it turns out that while technically possible, the solution will be
+many, many lines of convoluted SQL long, still take several intermediate views in more hairy cases, and best
+of all, now you have a wonderful, hairy beast of a string-splitting SQL implementation and you still can't
+apply it to the next occasion where you also want to split string but from a different source—because you
+can't do 'parametrized views' a.k.a. 'stored procedures' (?) a.k.a. 'functions' written in SQL, in SQLite;
+this is clearly one point where I miss Postgres because not only does it offer UDFs (user-defined
+functions), and not only can you choose whether you want to write them in pure SQL or in PL/pgSQL—in this
+case you likely wouldn't have to write your own table-valued function because Postgres already offers that
+(along with arrays &cpp).
+
+**Back to the Dual-Statement Approach:** So at least writing the string-splitting part made in JavaScript
+was highly desirable (essentially the difference between `String::split()` and dozens upon dozens of lines
+of poorly-tested recursive SQL), and the obvious way to integrate JavaScript and SQL was the
+'dual-statement' way, as outlined above. It worked, but it did make me wonder whether something was wrong
+with the code as I only reached up to 2,000Hz (rows per second), and as I pulled in more data that figure
+fell below 800Hz, which is abysmal; a quick web search convinced me that it should be more in the range of
+several 10,000Hz. By the way, adding explicit `begin transaction` and `commit` statements did in this case
+do almost nothing (although it's always good advice to not rely on autocommit when writing lots of rows).
+
+**The Single-Statement With Inline-Call-To-App Approach:** I then remembered another similar case and
+rewrote the processing, and **here comes the essential part**: *it's not only possible to write a single SQL
+statement that does **both** the data selection and the data insertion part, you can also still delegate
+some or all of the processing work*, and this is what it looks like:
+
+```sql
+insert into target_table ( rowid, ref, s, v, o )
+select
+gt.rowid_out    as rowid,
+gt.ref          as ref,
+gt.s            as s,
+gt.v            as v,
+gt.o            as o
+from source_table                                                   as ml
+join do_processing( ml.rowid, ml.field_1, ml.field_2, ml.field_3 )  as gt
+where true -- needed by SQLite's parser
+-- more conditions here
+on conflict ( ref, s, v, o ) do nothing -- or whatever is appropriate
+;
+```
+
+The central part of this statement is the call to `do_processing()` which is a user-defined table-valued
+function written in JS and declared on the DB connection (here I used CoffeeScript and my own DB adapter
+with a customized way to declare functions, but I could've just as well used JavaScript and
+[`better-sqlite3`](https://github.com/WiseLibs/better-sqlite3)'s [`table()`
+API](https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#tablename-definition---this)):
+
+```coffee
+@create_table_function
+name:         'do_processing'
+parameters:   [ 'rowid_in', 'field_1', 'field_2', 'field_3', 'field_4', ]
+columns:      [ 'rowid_out', 'ref', 's', 'v', 'o', ]
+rows: ( rowid_in, field_1, field_2, field_3, field_4 ) ->
+yield from me.do_processing rowid_in, field_1, field_2, field_3, field_4
+;null
+```
+
+Observe that this function does nothing but delegate the processing to a more suitable place and return an
+iterator over the results.
+
+To conclude: **The Single-Statement With Inline-Call-To-App Approach turned out to work at a whopping
+100,000Hz, being a 100x performance gain over the Dual-Statement Approach.**
+
 
 # Linux Shell / Bash
 
