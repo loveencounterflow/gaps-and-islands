@@ -52,6 +52,7 @@ This part to be updated by running `doctoc README.md`
   - [Another Way to Build Mixins: Commutators](#another-way-to-build-mixins-commutators)
   - [Mixing Named ('Qualified') and Positional Arguments](#mixing-named-qualified-and-positional-arguments)
   - ['Private' / Hidden Class Fields in CoffeeScript](#private--hidden-class-fields-in-coffeescript)
+  - [Preventing Accidental Unlicensed Calls](#preventing-accidental-unlicensed-calls)
 - [Regular Expressions](#regular-expressions)
   - [Matching Anything but not this sequence](#matching-anything-but-not-this-sequence)
 
@@ -1791,6 +1792,23 @@ info '^343-2^', x.publicMethod()
 * https://crimefighter.svbtle.com/using-private-methods-in-coffeescript
 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields
 
+## Preventing Accidental Unlicensed Calls
+
+In order to keep users from accidentally using a given method, use a private symbol as one of the arguments.
+That private symbol can still be exported, e.g. I've come to always include an `internals` object in the
+exports and one of the exports could be a variable `magic = Symbol 'magic'`; then, I can declare a method
+like `do_dangerous_internal_stuff: ( key, foo, bar, ... ) ->`, that will throw an exception when `key` isn't
+`magic`.
+
+In most cases this trick should not be really necessary when private methods are marked as such by
+prepending their name with an `_` underscore. However, there's one compelling use case that actually
+happened in NodeJS. When the `Buffer` class was first conceived in NodeJS, for some reason the constructor's
+behavior got screwed up with the result that it was easy to pass arguments to `new Buffer ...` and get
+unexpected behavior; for that reason, using the `Buffer::constructor()` method directly was deprecated in
+favor of a new static `Buffer.from()` method that behaves in less surprising ways.
+
+In such a case—when the `constructor()` method of a class should be kept private—demanding an obscure if not
+unobtainable special value to unlock the method could be a nice way to ensure users don't trip up.
 
 # Regular Expressions
 
