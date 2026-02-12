@@ -536,7 +536,8 @@ equivalent to `2e308` which will likewise be translated to `9e999`.
 
 * To ensure we remain within safe numerical bounds, we don't want to use numbers that exceed the range of JS
 'safe integers' (beyond safe integers, JS's IEEE754 implementation gives consecutive integers that are
-ever more sparsely distributed, so incrementing an unsafe integer does not necessarily give you `n+1`).
+ever more sparsely distributed, so incrementing an unsafe integer `n` does not necessarily give you
+`n+1`).
 
 * To check for numbers being not fractional, a traditional test is `n % 1 == 0`. That does work in
 JavaScript, which uses fractional modulo, but it does not work in SQLite, which uses integer modulo even
