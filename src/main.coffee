@@ -34,7 +34,8 @@ unquote                   = ( text      ) -> text.replace /^(['"])(.*)\1$/, '$2'
       when '<document', '>document' then null
       when '^text'
         dent = '  '.repeat d.level ? 0
-        await write me, dent + d.text
+        for line in d.text.split /\n/
+          await write me, dent + line
       when '^tag'
         unless d.name is 'insert'
           await write me, d.text
@@ -65,7 +66,8 @@ unquote                   = ( text      ) -> text.replace /^(['"])(.*)\1$/, '$2'
           await @interpret_inserts me, d
           continue
         dent = '  '.repeat d.level ? 0
-        await write me, dent + d.text
+        for line in d.text.split /\n/
+          await write me, dent + d.text
       else throw new Error "^4776^ unknown token $key #{rpr d.$key}"
   return me
 
