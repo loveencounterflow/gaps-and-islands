@@ -150,19 +150,19 @@ https://stackoverflow.com/a/8749095
 
 ```sql
 create view combifont as select
-V1.linenr           as linenr,
+        V1.linenr           as linenr,
 V1.iclabel          as iclabel,
 V1.styletag         as styletag,
 V1.fontnick         as fontnick,
 V1.glyphstyle       as glyphstyle
-from            all_glyphs_and_stylerules as V1
+    from            all_glyphs_and_stylerules as V1
 left outer join all_glyphs_and_stylerules as V2 on ( true
-and V1.iclabel  = V2.iclabel
+        and V1.iclabel  = V2.iclabel
 and V1.styletag = V2.styletag
 --  ^^^^^^^^^^^^^^^^^^^^^^^^^  join condition to narrow down on group
 and V1.linenr   < V2.linenr )
 --  ^^^^^^^^^^^^^^^^^^^^^^^    comparison that fails for V2 when V1 selector is maximal
-where V2.linenr is null
+    where V2.linenr is null
 --    ^^^^^^^^^^^^^^^^^ select maximum (or minimum w/ inverted comparator)
 order by iclabel, styletag;
 ```
@@ -176,8 +176,8 @@ It can be done in SQL:
 
 ```sql
 create function FM._array_regex_position( ¶texts text[], ¶regex text )
-returns bigint immutable parallel safe language sql as $$
-select nr from unnest( ¶texts ) with ordinality x ( d, nr )
+    returns bigint immutable parallel safe language sql as $$
+        select nr from unnest( ¶texts ) with ordinality x ( d, nr )
 where d ~ ¶regex order by nr limit 1; $$;
 
 select FM._array_regex_position( array[ 'foo', 'bar', 'baz' ], '^b' );  -- gives 2
@@ -359,10 +359,10 @@ columns:
 
 ```sql
 select
-d               as d,
+        d               as d,
 sqrt( d )       as e,
 sqrt( d ) * 2   as f
-from a;
+    from a;
 ```
 
 This solution is the more unsatisfying the more expensive the function call gets and the
@@ -372,10 +372,10 @@ references in the `from` clause, like this:
 
 ```sql
 select
-a.d             as d,
+        a.d             as d,
 r.e             as e,
 r.e * 2         as f
-from a,
+    from a,
 lateral sqrt( d ) as r ( e );
 ```
 
@@ -387,10 +387,10 @@ need to look for another solution. Turns out a `join` can be used as replacement
 
 ```sql
 select
-a.d             as d,
+        a.d             as d,
 r.e             as e,
 r.e * 2         as f
-from a
+    from a
 join ( select d, sqrt( d ) as e from a ) as r using ( d );
 ```
 
@@ -415,9 +415,9 @@ view` statements. For example, in an empty SQLite DB you can declare the followi
 ```sql
 drop view if exists bb_kw;
 create view if not exists bb_kw as select
-a,
+        a,
 b
-from nosuchtable;
+    from nosuchtable;
 ```
 
 without getting any hint that the view depends on a non-existant relation `nosuchtable` with non-existant
@@ -428,9 +428,9 @@ workaround: use the view immediately! So instead of code like shown above, alway
 ```sql
 drop view if exists bb_kw;
 create view if not exists bb_kw as select
-a,
+        a,
 b
-from nosuchtable;
+    from nosuchtable;
 select * from bb_kw where false;
 ```
 
@@ -481,17 +481,17 @@ some or all of the processing work*, and this is what it looks like:
 
 ```sql
 insert into target_table ( rowid, ref, s, v, o )
-select
-gt.rowid_out    as rowid,
+    select
+            gt.rowid_out    as rowid,
 gt.ref          as ref,
 gt.s            as s,
 gt.v            as v,
 gt.o            as o
-from source_table                                                   as ml
+        from source_table                                                   as ml
 join do_processing( ml.rowid, ml.field_1, ml.field_2, ml.field_3 )  as gt
 where true -- needed by SQLite's parser
--- more conditions here
-on conflict ( ref, s, v, o ) do nothing -- or whatever is appropriate
+            -- more conditions here
+    on conflict ( ref, s, v, o ) do nothing -- or whatever is appropriate
 ;
 ```
 
@@ -503,11 +503,11 @@ API](https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#tablenam
 
 ```coffee
 @create_table_function
-name:         'do_processing'
+    name:         'do_processing'
 parameters:   [ 'rowid_in', 'field_1', 'field_2', 'field_3', 'field_4', ]
 columns:      [ 'rowid_out', 'ref', 's', 'v', 'o', ]
 rows: ( rowid_in, field_1, field_2, field_3, field_4 ) ->
-yield from me.do_processing rowid_in, field_1, field_2, field_3, field_4
+        yield from me.do_processing rowid_in, field_1, field_2, field_3, field_4
 ;null
 ```
 
@@ -526,21 +526,21 @@ reject unsafe integers and fractional numbers.
 **Solution**:
 
 * As a nice surprise, SQLite's `real` storage type does include IEEE754 'infinity'. It will only appear as
-`Inf` or `-Inf` in query results; otherwise, we have to write an 'exceedingly big' number, for which
+    `Inf` or `-Inf` in query results; otherwise, we have to write an 'exceedingly big' number, for which
 `9e999` is conventionally used (based on StackOverflow answers; indeed, SQLite's `.dump` command will
 similarly use `9.0e+999` and `-9.0e+999` for exceedingly small or big `real`s).
 
 * `better-sqlite3` does recognize JS `Infinity` in parametrized queries and correctly translates from and to
-SQLite's `Inf` / `9e999`. We will ignore here the amusing and bewildering fact that JS `Infinity` is
+    SQLite's `Inf` / `9e999`. We will ignore here the amusing and bewildering fact that JS `Infinity` is
 equivalent to `2e308` which will likewise be translated to `9e999`.
 
 * To ensure we remain within safe numerical bounds, we don't want to use numbers that exceed the range of JS
-'safe integers' (beyond safe integers, JS's IEEE754 implementation gives consecutive integers that are
+    'safe integers' (beyond safe integers, JS's IEEE754 implementation gives consecutive integers that are
 ever more sparsely distributed, so incrementing an unsafe integer `n` does not necessarily give you
 `n+1`).
 
 * To check for numbers being not fractional, a traditional test is `n % 1 == 0`. That does work in
-JavaScript, which uses fractional modulo, but it does not work in SQLite, which uses integer modulo even
+    JavaScript, which uses fractional modulo, but it does not work in SQLite, which uses integer modulo even
 for fractional values (meaning `select 4.5 % 1 as r` gives you `r: 0.0`). Instead we use the `cast()`
 function / operator.
 
@@ -548,13 +548,13 @@ Here is a minimal table with a single column that fulfills our requirements:
 
 ```sql
 create table numbers (
-n real not null,
+    n real not null,
 constraint "Ωconstraint_113" check (
-( abs( n ) = 9e999 ) or (
-( n = cast( n as integer ) )
+        ( abs( n ) = 9e999 ) or (
+            ( n = cast( n as integer ) )
 and (      #{Number.MIN_SAFE_INTEGER} <= n )
 and ( n <= #{Number.MAX_SAFE_INTEGER} ) ) )
-) strict;
+      ) strict;
 ```
 
 The entire table is declared `strict`, so no type coercion shenanigans should occur. Our column `n` is
@@ -1854,35 +1854,35 @@ demo_commutator = ->
 ```coffee
 #.........................................................................................................
 demo_named_and_positional = ->
-#.......................................................................................................
+    #.......................................................................................................
 f = ({ 0: x_, 1: base_, x, base, k..., }) ->
-# debug 'Ωbrbr_248', [ arguments..., ], { x, base, x_, base_, }
+        # debug 'Ωbrbr_248', [ arguments..., ], { x, base, x_, base_, }
 x     = x_    unless x_     is undefined
 base  = base_ unless base_  is undefined
 debug 'Ωbrbr_249', { x, base, }
 return null
-#.......................................................................................................
+    #.......................................................................................................
 g = ({ Q..., }) ->
-# debug 'Ωbrbr_250', { Q, }
+        # debug 'Ωbrbr_250', { Q, }
 x     = if Q.x    isnt undefined then Q.x     else Q[ 0 ]
 base  = if Q.base isnt undefined then Q.base  else Q[ 1 ]
 debug 'Ωbrbr_251', { x, base, }
 return null
-#.......................................................................................................
+    #.......................................................................................................
 h = ({ Q..., }) ->
-{ x,
-base, } = get_pq_arguments Q, 'x', 'base'
-debug 'Ωbrbr_252', { x, base, }
+        { x,
+            base, } = get_pq_arguments Q, 'x', 'base'
+        debug 'Ωbrbr_252', { x, base, }
 return null
-#.......................................................................................................
+    #.......................................................................................................
 coalesce = ( x, names... ) ->
-for name in names
-return R if ( R = x[ name ] ) isnt undefined
-return undefined
-#.......................................................................................................
+        for name in names
+            return R if ( R = x[ name ] ) isnt undefined
+        return undefined
+    #.......................................................................................................
 get_pq_arguments = ( Q, names... ) -> Object.fromEntries \
-( [ name, ( coalesce Q, name, idx ), ] for name, idx in names )
-#.......................................................................................................
+        ( [ name, ( coalesce Q, name, idx ), ] for name, idx in names )
+    #.......................................................................................................
 f [ 5, 16, ]
 f { x: 5, base: 16, }
 f { x: 5, base: 16, arc: 16, bo: 11, }
@@ -1908,7 +1908,7 @@ demo_named_and_positional()
 
 ```coffee
 class SomeClass
-# this line is identical to `publicMethod: ->`
+    # this line is identical to `publicMethod: ->`
 this::publicMethod = -> '*' + privateMethod() + '*'
 privateProperty = 'foo'
 privateMethod = -> privateProperty
@@ -1951,7 +1951,7 @@ answer](https://stackoverflow.com/a/977294/7568091)), in order to match anything
 or `an` that precedes a word boundary `\b`, the pattern should be
 
 ```reges
-/^(?:(?!\b(?:the|an?)\b).)+/
+    /^(?:(?!\b(?:the|an?)\b).)+/
 ```
 
 That's a negative lookahead containing the pattern to be avoided, `(?! AVOID )`; this is nested in a
