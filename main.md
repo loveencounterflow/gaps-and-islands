@@ -240,6 +240,57 @@ iterator over the results.
 To conclude: **The Single-Statement With Inline-Call-To-App Approach turned out to work at a whopping
 100,000Hz, being a 100x performance gain over the Dual-Statement Approach.**
 
+## SQLite: Safe Integers with Infinity and Type Checking
+
+**Problem**: Working in NodeJS with (`better-sqlite3`)[https://github.com/WiseLibs/better-sqlite3], you want
+to have a column for integer numbers that also accept `Infinity` as in JavaScript numbers; you want to
+reject unsafe integers and fractional numbers.
+
+**Solution**:
+
+* As a nice surprise, SQLite's `real` storage type does include IEEE754 'infinity'. It will only appear as
+  `Inf` or `-Inf` in query results; otherwise, we have to write an 'exceedingly big' number, for which
+  `9e999` is conventionally used (based on StackOverflow answers; indeed, SQLite's `.dump` command will
+  similarly use `9.0e+999` and `-9.0e+999` for exceedingly small or big `real`s).
+
+* `better-sqlite3` does recognize JS `Infinity` in parametrized queries and correctly translates from and to
+  SQLite's `Inf` / `9e999`. We will ignore here the amusing and bewildering fact that JS `Infinity` is
+  equivalent to `2e308` which will likewise be translated to `9e999`.
+
+* To ensure we remain within safe numerical bounds, we don't want to use numbers that exceed the range of JS
+  'safe integers' (beyond safe integers, JS's IEEE754 implementation gives consecutive integers that are
+  ever more sparsely distributed, so incrementing an unsafe integer `n` does not necessarily give you
+  `n+1`).
+
+* To check for numbers being not fractional, a traditional test is `n % 1 == 0`. That does work in
+  JavaScript, which uses fractional modulo, but it does not work in SQLite, which uses integer modulo even
+  for fractional values (meaning `select 4.5 % 1 as r` gives you `r: 0.0`). Instead we use the `cast()`
+  function / operator.
+
+Here is a minimal table with a single column that fulfills our requirements:
+
+```sql
+create table numbers (
+  n real not null,
+  constraint "Ωconstraint_113" check (
+    ( abs( n ) = 9e999 ) or (
+      ( n = cast( n as integer ) )
+      and (      #{Number.MIN_SAFE_INTEGER} <= n )
+      and ( n <= #{Number.MAX_SAFE_INTEGER} ) ) )
+   ) strict;
+```
+
+The entire table is declared `strict`, so no type coercion shenanigans should occur. Our column `n` is
+declared as `real not null` so as to include `infinity` which we would not get with a column type `integer`.
+The `check` constraint accepts values with a nominal absolute magnitude of `9e999`, which accounts for
+`+Infinity` and `-Infinity`. We use `cast( n as integer )` to check that the fractional part of `n` is zero.
+Lastly, we check whether `n` is between the bounds for JavaScript safe integers. The above `create table`
+statement uses interpolation; written out as integer literals the bounds become:
+
+```js
+Number.MIN_SAFE_INTEGER: -9007199254740991
+Number.MAX_SAFE_INTEGER: +9007199254740991
+```
 
 # Linux Shell / Bash
 
